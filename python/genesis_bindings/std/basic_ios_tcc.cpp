@@ -24,7 +24,6 @@
 #include <../python/custom_bindings/extensions/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/taxopath.hpp>
 #include <../python/custom_bindings/extensions/functions_taxonomy.hpp>
-#include <../python/custom_bindings/extensions/common_node_data.hpp>
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>

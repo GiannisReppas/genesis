@@ -37,7 +37,6 @@
 #include <../python/custom_bindings/extensions/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/taxopath.hpp>
 #include <../python/custom_bindings/extensions/functions_taxonomy.hpp>
-#include <../python/custom_bindings/extensions/common_node_data.hpp>
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
@@ -69,8 +68,6 @@ void bind_genesis_tree_common_tree_tree(std::function< pybind11::module &(std::s
 		pybind11::class_<genesis::tree::CommonNodeData, std::shared_ptr<genesis::tree::CommonNodeData>, PyCallBack_genesis_tree_CommonNodeData> cl(M("genesis::tree"), "CommonNodeData", "Common class containing the commonly needed data for tree nodes.\n\n The Tree class can use all data for its nodes that derive from BaseNodeData.\n In most cases, nodes will contain the node's name and edges will contain a branch length.\n\n This class is a default for node data, and can be derived from if a node name is wanted. It is\n however not necessary -- so if there is no need for node names, you can provide your own,\n class for tree, as long as it also derives from BaseNodeData.");
 		cl.def_readwrite("name", &genesis::tree::CommonNodeData::name);
 		cl.def_static("create", (class std::unique_ptr<class genesis::tree::CommonNodeData, struct std::default_delete<class genesis::tree::CommonNodeData> > (*)()) &genesis::tree::CommonNodeData::create, "C++: genesis::tree::CommonNodeData::create() --> class std::unique_ptr<class genesis::tree::CommonNodeData, struct std::default_delete<class genesis::tree::CommonNodeData> >");
-
-		extend_common_node_data(cl);
 	}
 	{ // genesis::tree::CommonEdgeData file:genesis/tree/common_tree/tree.hpp line:144
 		pybind11::class_<genesis::tree::CommonEdgeData, std::shared_ptr<genesis::tree::CommonEdgeData>, PyCallBack_genesis_tree_CommonEdgeData> cl(M("genesis::tree"), "CommonEdgeData", "Common class containing the commonly needed data for tree edges.\n\n This class is the equivalent of CommonNodeData for the tree edges. It stores a branch length\n for each edge. For more information, see CommonNodeData.\n\n If you for example do not need a single branch length, but multiple ones (e.g., when working with\n partitions), simply do not derive from this class, but provide your own implementation.");

@@ -1,147 +1,132 @@
 import sys
+import unittest
 
-sys.path.append('./bin')
+sys.path.append('./genesis_bindings')
 
-from yoyo.genesis.utils import *
-from yoyo.genesis.tree import *
+from mylibgenesis.genesis.utils import *
+from mylibgenesis.genesis.tree import *
 
-def count_attribute_tree_data( tree: Tree):
-	node_attr_cnt = 0
-	for node in tree.nodes():
-		data = node.data()
-		node_attr_cnt = node_attr_cnt + len(data.attributes)
+class NewickReaderTest(unittest.TestCase):
 
-	edge_attr_cnt = 0
-	for edge in tree.edges():
-		data = edge.data()
-		edge_attr_cnt = edge_attr_cnt + len(data.attributes)
+	def count_attribute_tree_data( self, tree: Tree):
+		node_attr_cnt = 0
+		for node in tree.nodes():
+			data = node.data()
+			node_attr_cnt = node_attr_cnt + len(data.attributes)
 
-	return (node_attr_cnt, edge_attr_cnt)
+		edge_attr_cnt = 0
+		for edge in tree.edges():
+			data = edge.data()
+			edge_attr_cnt = edge_attr_cnt + len(data.attributes)
 
-def print_attribute_tree_data( tree: Tree):
-	#LOG_DBG << "Nodes";
-	for node in tree.nodes():
-		data = node.data()
-		#LOG_DBG1 << "node " << data.name;
-		for m in data.attributes:
-			True
-			#LOG_DBG2 << m.first << " --> " << m.second;
+		return (node_attr_cnt, edge_attr_cnt)
 
-	#LOG_DBG << "Edges";
-	for edge in tree.edges():
-		data = edge.data();
-		#LOG_DBG1 << "edge";
-		for m in data.attributes:
-			True
-			#LOG_DBG2 << m.first << " --> " << m.second;
+	def print_attribute_tree_data( self, tree: Tree):
+		#LOG_DBG << "Nodes";
+		for node in tree.nodes():
+			data = node.data()
+			#LOG_DBG1 << "node " << data.name;
+			for m in data.attributes:
+				True
+				#LOG_DBG2 << m.first << " --> " << m.second;
 
-###################################################
-########## INDEXED_NEWICK_READER_INDEX ############
+		#LOG_DBG << "Edges";
+		for edge in tree.edges():
+			data = edge.data();
+			#LOG_DBG1 << "edge";
+			for m in data.attributes:
+				True
+				#LOG_DBG2 << m.first << " --> " << m.second;
 
-#Read and process tree.
-infile = "test/data/tree/indexed_attributes_0.newick"
+	def test_indexed_newick_reader_index(self):
 
-reader = IndexedAttributeTreeNewickReader()
-reader.add_attribute( IndexedAttributeTreeNewickReader.Source.kComment, 0, IndexedAttributeTreeNewickReader.Target.kEdge, "bootstrap")
+		#Read and process tree.
+		infile = "test/data/tree/indexed_attributes_0.newick"
 
-tree = reader.read( from_file( infile ))
+		reader = IndexedAttributeTreeNewickReader()
+		reader.add_attribute( IndexedAttributeTreeNewickReader.Source.kComment, 0, IndexedAttributeTreeNewickReader.Target.kEdge, "bootstrap")
 
-counts = count_attribute_tree_data( tree )
-if 0 != counts[0]:
-	print("Error at INDEXED_NEWICK_READER_INDEX-1")
-if 3 != counts[1]:
-	print("Error at INDEXED_NEWICK_READER_INDEX-2")
+		tree = reader.read( from_file( infile ))
 
-#print_attribute_tree_data( tree );
+		counts = self.count_attribute_tree_data( tree )
+		self.assertEqual(0,counts[0])
+		self.assertEqual(3,counts[1])
 
-###################################################
-######## INDEXED_NEWICK_READER_CATCH_ALL ##########
+		#print_attribute_tree_data( tree );
 
-# Read and process tree.
-infile = "test/data/tree/indexed_attributes_1.newick"
+	def test_indexed_newick_reader_catch_all(self):
 
-reader = IndexedAttributeTreeNewickReader()
-reader.add_catch_all( IndexedAttributeTreeNewickReader.Source.kComment, IndexedAttributeTreeNewickReader.Target.kEdge, "comment_")
+		# Read and process tree.
+		infile = "test/data/tree/indexed_attributes_1.newick"
 
-tree = reader.read( from_file( infile ))
+		reader = IndexedAttributeTreeNewickReader()
+		reader.add_catch_all( IndexedAttributeTreeNewickReader.Source.kComment, IndexedAttributeTreeNewickReader.Target.kEdge, "comment_")
 
-node_attr_cnt = 0
-for node in tree.nodes():
-	data = node.data();
-	node_attr_cnt = node_attr_cnt + len(data.attributes)
-if 0 != node_attr_cnt:
-	print("Error at INDEXED_NEWICK_READER_CATCH_ALL-1")
+		tree = reader.read( from_file( infile ))
 
-edge_attr_cnt = 0
-for edge in tree.edges():
-	data = edge.data()
-	edge_attr_cnt += len(data.attributes)
-if 12 != edge_attr_cnt:
-	print("Error at INDEXED_NEWICK_READER_CATCH_ALL-2")
+		node_attr_cnt = 0
+		for node in tree.nodes():
+			data = node.data();
+			node_attr_cnt = node_attr_cnt + len(data.attributes)
+		self.assertEqual(0,node_attr_cnt)
 
-counts = count_attribute_tree_data( tree )
-if  0 != counts[0]:
-	print("Error at INDEXED_NEWICK_READER_CATCH_ALL-3")
-if 12 != counts[1]:
-	print("Error at INDEXED_NEWICK_READER_CATCH_ALL-4")
+		edge_attr_cnt = 0
+		for edge in tree.edges():
+			data = edge.data()
+			edge_attr_cnt += len(data.attributes)
+		self.assertEqual(12,edge_attr_cnt)
 
-###################################################
-############# KEYED_NEWICK_READER_KEYS ############
+		counts = self.count_attribute_tree_data( tree )
+		self.assertEqual(0,counts[0])
+		self.assertEqual(12,counts[1])
 
-#Read and process tree.
-infile = "test/data/tree/keyed_attributes_0.newick"
+	def test_keyed_newick_reader_keys(self):
 
-reader = KeyedAttributeTreeNewickReader()
-reader.add_attribute( "bs",     KeyedAttributeTreeNewickReader.Target.kEdge )
-reader.add_attribute( "!color", KeyedAttributeTreeNewickReader.Target.kEdge, "color" )
+		#Read and process tree.
+		infile = "test/data/tree/keyed_attributes_0.newick"
 
-tree = reader.read( from_file( infile ))
+		reader = KeyedAttributeTreeNewickReader()
+		reader.add_attribute( "bs",     KeyedAttributeTreeNewickReader.Target.kEdge )
+		reader.add_attribute( "!color", KeyedAttributeTreeNewickReader.Target.kEdge, "color" )
 
-counts = count_attribute_tree_data( tree )
-if 0 != counts[0]:
-	print("Error at KEYED_NEWICK_READER_KEYS-1")
-if 4 != counts[1]:
-	print("Error at KEYED_NEWICK_READER_KEYS-2")
+		tree = reader.read( from_file( infile ))
 
-###################################################
-########### KEYED_NEWICK_READER_CATCH_ALL #########
+		counts = self.count_attribute_tree_data( tree )
+		self.assertEqual(0,counts[0])
+		self.assertEqual(4,counts[1])
 
-# Read and process tree.
-Infile = "test/data/tree/keyed_attributes_0.newick"
+	def test_keyed_newick_reader_catch_all(self):
 
-reader = KeyedAttributeTreeNewickReader()
-reader.add_catch_all( KeyedAttributeTreeNewickReader.Target.kEdge )
+		# Read and process tree.
+		infile = "test/data/tree/keyed_attributes_0.newick"
 
-tree = reader.read( from_file( infile ))
+		reader = KeyedAttributeTreeNewickReader()
+		reader.add_catch_all( KeyedAttributeTreeNewickReader.Target.kEdge )
 
-counts = count_attribute_tree_data( tree )
-if 0 != counts[0]:
-	print("Error at KEYED_NEWICK_READER_CATCH_ALL-1")
-if 4 != counts[1]:
-	print("Error at KEYED_NEWICK_READER_CATCH_ALL-2")
+		tree = reader.read( from_file( infile ))
 
-# print_attribute_tree_data( tree );
+		counts = self.count_attribute_tree_data( tree )
+		self.assertEqual(0,counts[0])
+		self.assertEqual(4,counts[1])
 
-###################################################
-############## KEYED_NEWICK_READER_NHX ############
+		# print_attribute_tree_data( tree );
 
-# Read and process tree.
-infile = "test/data/tree/keyed_attributes_1.newick"
+	def test_keyed_newick_reader_nhx(self):
 
-reader = KeyedAttributeTreeNewickReader()
-reader.add_nhx_attributes()
-# reader.add_catch_all( KeyedAttributeTreeNewickReader::Target::kNode );
+		# Read and process tree.
+		infile = "test/data/tree/keyed_attributes_1.newick"
 
-tree = reader.read( from_file( infile ))
+		reader = KeyedAttributeTreeNewickReader()
+		reader.add_nhx_attributes()
+		# reader.add_catch_all( KeyedAttributeTreeNewickReader::Target::kNode );
 
-counts = count_attribute_tree_data( tree )
-if 25 != counts[0]:
-	print("Error at KEYED_NEWICK_READER_NHX-1")
-if  1 != counts[1]:
-	print("Error at KEYED_NEWICK_READER_NHX-2")
+		tree = reader.read( from_file( infile ))
 
-# print_attribute_tree_data( tree );
+		counts = self.count_attribute_tree_data( tree )
+		self.assertEqual(25,counts[0])
+		self.assertEqual(1,counts[1])
 
-###################################################
+		# print_attribute_tree_data( tree );
 
-print("\nDone")
+if __name__ == '__main__':
+	unittest.main()

@@ -1,42 +1,40 @@
 import sys
+import unittest
 
-sys.path.append('./bin')
+sys.path.append('./genesis_bindings')
 
-from yoyo.genesis.utils import *
-from yoyo.genesis.tree import *
+from mylibgenesis.genesis.utils import *
+from mylibgenesis.genesis.tree import *
 
-###################################################
-#################### RFDISTANCE ####################
+class rfTest(unittest.TestCase):
 
-trees = TreeSet()
-infile = "./test/data/tree/random-trees.newick";
-CommonTreeNewickReader().read( from_file( infile ), trees );
-if 10 != trees.size():
-	print("Error at RFDISTANCE-1")
+	def test_rfdistance(self):
 
-rf_mat = rf_distance_absolute( trees )
+		trees = TreeSet()
+		infile = "./test/data/tree/random-trees.newick";
+		CommonTreeNewickReader().read( from_file( infile ), trees );
+		self.assertEqual(10,trees.size())
 
-rf_mat_exp = Matrix_unsigned_long_t( 10, 10, [
-	0, 14, 14, 12, 14, 14, 14, 10, 14, 10,
-	14, 0, 14, 14, 14, 14, 14, 14, 14, 14,
-	14, 14, 0, 14, 12, 14, 10, 14, 14, 14,
-	12, 14, 14, 0, 14, 14, 12, 12, 14, 14,
-	14, 14, 12, 14, 0, 14, 14, 14, 12, 14,
-	14, 14, 14, 14, 14, 0, 14, 12, 12, 14,
-	14, 14, 10, 12, 14, 14, 0, 12, 14, 14,
-	10, 14, 14, 12, 14, 12, 12, 0, 14, 12,
-	14, 14, 14, 14, 12, 12, 14, 14, 0, 14,
-	10, 14, 14, 14, 14, 14, 14, 12, 14, 0
-]);
-if rf_mat_exp != rf_mat:
-	print("Error at RFDISTANCE-2")
+		rf_mat = rf_distance_absolute( trees )
 
-rf_vec = rf_distance_absolute( trees[0], trees )
+		rf_mat_exp = Matrix_unsigned_long_t( 10, 10, [
+			0, 14, 14, 12, 14, 14, 14, 10, 14, 10,
+			14, 0, 14, 14, 14, 14, 14, 14, 14, 14,
+			14, 14, 0, 14, 12, 14, 10, 14, 14, 14,
+			12, 14, 14, 0, 14, 14, 12, 12, 14, 14,
+			14, 14, 12, 14, 0, 14, 14, 14, 12, 14,
+			14, 14, 14, 14, 14, 0, 14, 12, 12, 14,
+			14, 14, 10, 12, 14, 14, 0, 12, 14, 14,
+			10, 14, 14, 12, 14, 12, 12, 0, 14, 12,
+			14, 14, 14, 14, 12, 12, 14, 14, 0, 14,
+			10, 14, 14, 14, 14, 14, 14, 12, 14, 0
+		]);
+		self.assertEqual(rf_mat_exp,rf_mat)
 
-rf_vec_exp = [0, 14, 14, 12, 14, 14, 14, 10, 14, 10]
-if rf_vec_exp != rf_vec:
-	print("Error at RFDISTANCE-3")
+		rf_vec = rf_distance_absolute( trees[0], trees )
 
-###################################################
+		rf_vec_exp = [0, 14, 14, 12, 14, 14, 14, 10, 14, 10]
+		self.assertEqual(rf_vec_exp,rf_vec)
 
-print("\nDone")
+if __name__ == '__main__':
+    unittest.main()

@@ -10,7 +10,7 @@ inline void extend_common_node_data( T& cl )
 	cl.def("clone", [](::genesis::tree::CommonNodeData& self)
 	{
 		::genesis::tree::CommonNodeData *toReturn = (::genesis::tree::CommonNodeData*) self.clone().release();
-		//return *toReturn;
+		return *toReturn;
 	}, pybind11::return_value_policy::move);
 }
 

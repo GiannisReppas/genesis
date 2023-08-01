@@ -1,46 +1,34 @@
 import sys
+import unittest
 
-sys.path.append('./bin')
+sys.path.append('./genesis_bindings')
 
-from yoyo.genesis.utils import *
-from yoyo.genesis.tree import *
+from mylibgenesis.genesis.utils import *
+from mylibgenesis.genesis.tree import *
 
-##################################################
-################### BASICS #######################
+class TreeTest(unittest.TestCase):
 
-input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
+	def test_basics(self):
 
-tree = CommonTreeNewickReader().read( from_file('./test/src/tree/tree_py.txt') )
-#tree = CommonTreeNewickReader().read( from_string(input) )
+		input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
 
-if 2 != degree( tree.root_node() ):
-	print("Error at BASICS-1")
-if 7 != leaf_node_count( tree ):
-	print("Error at BASICS-2")
-if 6 != inner_node_count( tree ):
-	print("Error at BASICS-3")
-if 13 != tree.node_count():
-	print("Error at BASICS-4")
-if not is_bifurcating( tree ):
-	print("Error at BASICS-5")
+		tree = CommonTreeNewickReader().read( from_file('./test/src/tree/tree_py.txt') )
+		#tree = CommonTreeNewickReader().read( from_string(input) )
 
-if "R" != tree.root_node().data().name:
-	print("Error at BASICS-6")
-if not validate_topology( tree ):
-	print("Error at BASICS-7")
+		self.assertEqual(2,degree(tree.root_node()))
+		self.assertEqual(7,leaf_node_count(tree))
+		self.assertEqual(6,inner_node_count(tree))
+		self.assertEqual(13,tree.node_count())
+		self.assertTrue(is_bifurcating(tree))
 
-#Tree copy_a{ tree }
-copy_a = tree
-if not validate_topology( copy_a ):
-	print("Error at BASICS-8")
+		self.assertEqual("R",tree.root_node().data().name)
+		self.assertTrue(validate_topology(tree))
 
-copy_b = tree
-if not validate_topology( copy_b ):
-	print("Error at BASICS-9")
+		copy_a = tree
+		self.assertTrue(validate_topology(copy_a))
 
-##################################################
+		copy_b = tree
+		self.assertTrue(validate_topology(copy_b))
 
-print("\nDone")
-
-class MyPythonNodeData(CommonNodeData):
-	pass
+if __name__ == '__main__':
+    unittest.main()

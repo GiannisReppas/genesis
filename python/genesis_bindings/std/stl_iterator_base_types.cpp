@@ -20,7 +20,6 @@
 #include <../python/custom_bindings/extensions/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/taxopath.hpp>
 #include <../python/custom_bindings/extensions/functions_taxonomy.hpp>
-#include <../python/custom_bindings/extensions/common_node_data.hpp>
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
@@ -54,7 +53,7 @@ void bind_std_stl_iterator_base_types(std::function< pybind11::module &(std::str
 		cl.def( pybind11::init( [](std::iterator<std::random_access_iterator_tag,std::string,long,std::string *,std::string &> const &o){ return new std::iterator<std::random_access_iterator_tag,std::string,long,std::string *,std::string &>(o); } ) );
 		cl.def("assign", (struct std::iterator<struct std::random_access_iterator_tag, std::string, long, std::string *, std::string &> & (std::iterator<std::random_access_iterator_tag,std::string,long,std::string *,std::string &>::*)(const struct std::iterator<struct std::random_access_iterator_tag, std::string, long, std::string *, std::string &> &)) &std::iterator<std::random_access_iterator_tag, std::string, long, std::string *, std::string &>::operator=, "C++: std::iterator<std::random_access_iterator_tag, std::string, long, std::string *, std::string &>::operator=(const struct std::iterator<struct std::random_access_iterator_tag, std::string, long, std::string *, std::string &> &) --> struct std::iterator<struct std::random_access_iterator_tag, std::string, long, std::string *, std::string &> &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 	}
-	{ // std::reverse_iterator file:bits/stl_iterator.h line:127
+	{ // std::reverse_iterator file:bits/stl_iterator.h line:128
 		pybind11::class_<std::reverse_iterator<__gnu_cxx::__normal_iterator<std::string *, std::vector<std::string> >>, std::shared_ptr<std::reverse_iterator<__gnu_cxx::__normal_iterator<std::string *, std::vector<std::string> >>>, std::iterator<std::random_access_iterator_tag,std::string,long,std::string *,std::string &>> cl(M("std"), "reverse_iterator___gnu_cxx___normal_iterator_std_string__star__std_vector_std_string_t", "");
 		cl.def( pybind11::init( [](){ return new std::reverse_iterator<__gnu_cxx::__normal_iterator<std::string *, std::vector<std::string> >>(); } ) );
 		cl.def( pybind11::init<class __gnu_cxx::__normal_iterator<std::string *, class std::vector<std::string, class std::allocator<std::string > > >>(), pybind11::arg("__x") );

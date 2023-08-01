@@ -1,43 +1,42 @@
 import sys
+import unittest
 
-sys.path.append('./bin')
+sys.path.append('./genesis_bindings')
 
-from yoyo.genesis.utils import *
-from yoyo.genesis.tree import *
+from mylibgenesis.genesis.utils import *
+from mylibgenesis.genesis.tree import *
 
-##################################################
-################### COMPACT ######################
+class PrinterTest(unittest.TestCase):
 
-input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
+	def test_compact(self):
 
-#tree = CommonTreeNewickReader().read( from_string( input ))
-tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
+		input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
 
-tp = PrinterCompact()
-res = tp.print(tree)
+		#tree = CommonTreeNewickReader().read( from_string( input ))
+		tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
 
-##################################################
-################### DETAILED #####################
+		tp = PrinterCompact()
+		res = tp.print(tree)
 
-input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
+	def test_detailed(self):
 
-#tree = CommonTreeNewickReader().read( from_string( input ))
-tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
+		input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;"
 
-tp = PrinterDetailed()
-res = tp.print(tree)
+		#tree = CommonTreeNewickReader().read( from_string( input ))
+		tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
 
-##################################################
-##################### TABLE ######################
+		tp = PrinterDetailed()
+		res = tp.print(tree)
 
-input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;";
+	def test_table(self):
 
-#tree = CommonTreeNewickReader().read( from_string( input ))
-tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
+		input = "((A,(B,C)D)E,((F,(G,H)I)J,K)L)R;";
 
-tp = PrinterTable()
-res = tp.print(tree)
+		#tree = CommonTreeNewickReader().read( from_string( input ))
+		tree = CommonTreeNewickReader().read( from_file( './test/src/tree/printer_py.txt' ))
 
-##################################################
+		tp = PrinterTable()
+		res = tp.print(tree)
 
-print("\nDone")
+if __name__ == '__main__':
+    unittest.main()

@@ -37,7 +37,7 @@ class Printer(unittest.TestCase):
 		for i in range(1,32):
 			printer.line_limit( i )
 			head = printer( tax )
-			
+
 			self.assertEqual( mylibgenesis.genesis.utils.head(all, i) + "\n...\n", head)
 
 if __name__ == '__main__':
