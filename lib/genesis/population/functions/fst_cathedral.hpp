@@ -71,7 +71,7 @@ namespace population {
  * estimators. Hence, we keep the per position pi values here, so that they can then be accumulated
  * into the per-pixel values for the plot later.
  */
-struct FstCathedralPlotRecord : public CathedralPlotRecord
+struct FstCathedralPlotRecord final : public CathedralPlotRecord
 {
     struct Entry
     {
@@ -86,14 +86,6 @@ struct FstCathedralPlotRecord : public CathedralPlotRecord
         double pi_within  = 0.0;
         double pi_between = 0.0;
         double pi_total   = 0.0;
-
-        bool all_finite() const
-        {
-            auto const pi_w_fininite = std::isfinite( pi_within );
-            auto const pi_b_fininite = std::isfinite( pi_between );
-            auto const pi_t_fininite = std::isfinite( pi_total );
-            return pi_w_fininite && pi_b_fininite && pi_t_fininite;
-        }
     };
 
     // The actual components of FST values per position.
@@ -222,12 +214,12 @@ std::vector<FstCathedralPlotRecord> compute_fst_cathedral_records(
  * The returned matrix can then be plotted as a heatmap.
  */
 void compute_fst_cathedral_matrix(
-    CathedralPlotProperties const& properties,
+    CathedralPlotParameters const& parameters,
     FstCathedralPlotRecord& record
 ) {
     auto accu = FstCathedralAccumulator( record.fst_estimator );
     return compute_cathedral_matrix<FstCathedralPlotRecord, FstCathedralAccumulator>(
-        properties, record, accu
+        parameters, record, accu
     );
 }
 
@@ -239,7 +231,7 @@ void compute_fst_cathedral_matrix(
  * @brief Get a user-readable description of the data of a FstCathedralPlotRecord as a
  * @link genesis::utils::JsonDocument JsonDocument@endlink.
  *
- * @see cathedral_plot_record_to_json_document(), cathedral_plot_properties_to_json_document(),
+ * @see cathedral_plot_record_to_json_document(), cathedral_plot_parameters_to_json_document(),
  * save_cathedral_plot_record_to_files(), load_cathedral_plot_record_from_files()
  */
 genesis::utils::JsonDocument fst_cathedral_plot_record_to_json_document(
