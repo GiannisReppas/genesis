@@ -6,14 +6,14 @@ sys.path.append('./genesis_bindings')
 from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.population import *
 
-class BedReader(unittest.TestCase):
+class BedReaderTest(unittest.TestCase):
 
 	def test_Read1(self):
 
 		infile = "test/data/population/wiki1.bed3"
 
-		import mylibgenesis.genesis.population;
-		reader = mylibgenesis.genesis.population.BedReader()
+		reader = BedReader()
+
 		regions = reader.read_as_genome_region_list( from_file( infile ))
 		self.assertEqual( 3, regions.total_region_count() )
 		self.assertFalse( regions.is_covered( "chr7", 127471196 ))
@@ -31,8 +31,8 @@ class BedReader(unittest.TestCase):
 
 		infile = "test/data/population/wiki2.bed"
 
-		import mylibgenesis.genesis.population;
-		reader = mylibgenesis.genesis.population.BedReader()
+		reader = BedReader()
+
 		regions = reader.read_as_genome_region_list( from_file( infile ))
 		self.assertEqual( 9, regions.total_region_count() )
 		self.assertFalse( regions.is_covered( "chr7", 127471196 ))
@@ -44,8 +44,8 @@ class BedReader(unittest.TestCase):
 
 		infile = "test/data/population/ucsc.bed";
 
-		import mylibgenesis.genesis.population;
-		reader = mylibgenesis.genesis.population.BedReader()
+		reader = BedReader()
+		
 		regions = reader.read_as_genome_region_list( from_file( infile ))
 		self.assertEqual( 2, regions.total_region_count() )
 		self.assertFalse( regions.is_covered( "chr22", 1000 ))
