@@ -31,16 +31,18 @@
  * @ingroup population
  */
 
-#include "genesis/population/functions/fst_pool.hpp"
+#include "genesis/population/functions/fst_pool_calculator.hpp"
 #include "genesis/population/functions/functions.hpp"
 #include "genesis/utils/core/std.hpp"
 #include "genesis/utils/math/common.hpp"
-#include "genesis/utils/math/kahan_sum.hpp"
+#include "genesis/utils/math/compensated_sum.hpp"
+#include "genesis/utils/text/string.hpp"
 
 #include <cassert>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -174,11 +176,18 @@ private:
 
     double get_result_() override
     {
-        if( estimator_ == Estimator::kNei ) {
-            return get_result_pair().first;
-        } else {
-            return get_result_pair().second;
+        switch( estimator_ ) {
+            case Estimator::kNei: {
+                return get_result_pair().first;
+            }
+            case Estimator::kHudson: {
+                return get_result_pair().second;
+            }
+            default: {
+                throw std::invalid_argument( "Invalid FstPoolCalculatorUnbiased::Estimator" );
+            }
         }
+        return 0.0;
     }
 
     // -------------------------------------------------------------------------
@@ -264,11 +273,44 @@ private:
     Estimator estimator_ = Estimator::kNei;
 
     // Sums over the window of pi within, between, total.
-    utils::KahanSum pi_w_sum_ = 0.0;
-    utils::KahanSum pi_b_sum_ = 0.0;
-    utils::KahanSum pi_t_sum_ = 0.0;
+    utils::NeumaierSum pi_w_sum_ = 0.0;
+    utils::NeumaierSum pi_b_sum_ = 0.0;
+    utils::NeumaierSum pi_t_sum_ = 0.0;
 
 };
+
+// =================================================================================================
+//     Estimator Helper Functions
+// =================================================================================================
+
+inline std::string fst_pool_unbiased_estimator_to_string(
+    FstPoolCalculatorUnbiased::Estimator estimator
+) {
+    switch( estimator ) {
+        case FstPoolCalculatorUnbiased::Estimator::kNei: {
+            return "Nei";
+        }
+        case FstPoolCalculatorUnbiased::Estimator::kHudson: {
+            return "Hudson";
+        }
+        default: {
+            throw std::invalid_argument( "Invalid FstPoolCalculatorUnbiased::Estimator" );
+        }
+    }
+}
+
+inline FstPoolCalculatorUnbiased::Estimator fst_pool_unbiased_estimator_from_string(
+    std::string const& str
+) {
+    auto const low = genesis::utils::to_lower( str );
+    if( low == "nei" ) {
+        return FstPoolCalculatorUnbiased::Estimator::kNei;
+    }
+    if( low == "hudson" ) {
+        return FstPoolCalculatorUnbiased::Estimator::kHudson;
+    }
+    throw std::invalid_argument( "Invalid FstPoolCalculatorUnbiased::Estimator: " + str );
+}
 
 } // namespace population
 } // namespace genesis
