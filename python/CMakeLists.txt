@@ -48,12 +48,13 @@ add_library(mylibgenesis SHARED
 	genesis/utils/formats/nexus/writer.cpp
 	genesis/utils/math/statistics.cpp
 	genesis/utils/math/statistics_1.cpp
-	genesis/utils/math/statistics_2.cpp
+	genesis/utils/math/matrix.cpp
 	genesis/utils/containers/interval_tree.cpp
 	genesis/utils/containers/interval_tree/node.cpp
 	genesis/utils/containers/interval_tree/iterator.cpp
 	genesis/utils/containers/interval_tree/node_1.cpp
 	__/python/custom_bindings/template_instances/matrix.cpp
+	genesis/utils/containers/lambda_iterator.cpp
 	genesis/sequence/functions/codes.cpp
 	genesis/sequence/counts.cpp
 	genesis/sequence/formats/phylip_reader.cpp
@@ -110,6 +111,13 @@ add_library(mylibgenesis SHARED
 	genesis/placement/simulator/distributions.cpp
 	genesis/population/genome_region.cpp
 	genesis/population/genome_locus_set.cpp
+	genesis/population/base_counts.cpp
+	genesis/population/formats/simple_pileup_input_iterator.cpp
+	genesis/population/formats/sync_reader.cpp
+	genesis/population/formats/variant_input_iterator.cpp
+	genesis/population/window/base_window.cpp
+	genesis/population/window/chromosome_iterator.cpp
+	__/python/custom_bindings/template_instances/lambda_iterator.cpp
 )
 target_link_libraries(mylibgenesis PUBLIC /home/giannis/Desktop/genesis/bin/libgenesis.so )
 set_target_properties(mylibgenesis PROPERTIES PREFIX "")

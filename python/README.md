@@ -1,11 +1,12 @@
 //ignoring tests in comments
 
+/* general */
+
 add pybind11 autodownload in CMake script
 change python script to cmake file
-
 why -include-pybind11-stl for binder command and not in config file
 have a .copy() method for some classes
-ostream in python
+bind ostream in python
 from_string, to string errors
 
 
@@ -15,7 +16,7 @@ from_string, to string errors
 math/bitvector.py STREAMS - difficulties translating c++ to python code - __REPR__
 interoperatability between numpy and matrix
 stossc warning (error for c++ version > 11)
-why ::genesis::utils::operator<< wont compile for template parameter ::genesis::utils::Color
+why ::genesis::utils::operator<< won't compile for template parameter ::genesis::utils::Color
 
 
 /* sequence */
@@ -35,6 +36,7 @@ taxonomy/iterator.py - error at last test
 create a copy function for Node,EdgeData
 OR
 create a class only for python to keep a py::object in a CommonNodeData derived class
+ONLY IF IT IS REALLY NEEDED IN PYTHON
 
 tree/drawing.py - end of tests, find a way to bind ostream
 tree/drawing.py - tests don't check anything, they just execute commands

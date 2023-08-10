@@ -3,6 +3,7 @@
 #include <genesis/population/genome_locus.hpp>
 #include <genesis/population/genome_locus_set.hpp>
 #include <genesis/population/genome_region.hpp>
+#include <genesis/population/genome_region_list.hpp>
 #include <genesis/utils/containers/interval_tree.hpp>
 #include <genesis/utils/containers/interval_tree/interval.hpp>
 #include <genesis/utils/io/base_input_source.hpp>

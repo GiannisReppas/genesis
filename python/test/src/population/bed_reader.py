@@ -12,7 +12,8 @@ class BedReader(unittest.TestCase):
 
 		infile = "test/data/population/wiki1.bed3"
 
-		reader = BedReader()
+		import mylibgenesis.genesis.population;
+		reader = mylibgenesis.genesis.population.BedReader()
 		regions = reader.read_as_genome_region_list( from_file( infile ))
 		self.assertEqual( 3, regions.total_region_count() )
 		self.assertFalse( regions.is_covered( "chr7", 127471196 ))
@@ -25,6 +26,32 @@ class BedReader(unittest.TestCase):
 		self.assertTrue(  regions.is_covered( "chr7", 127473532 ))
 		self.assertTrue(  regions.is_covered( "chr7", 127474697 ))
 		self.assertFalse( regions.is_covered( "chr7", 127474698 ))
+
+	def test_Read2(self):
+
+		infile = "test/data/population/wiki2.bed"
+
+		import mylibgenesis.genesis.population;
+		reader = mylibgenesis.genesis.population.BedReader()
+		regions = reader.read_as_genome_region_list( from_file( infile ))
+		self.assertEqual( 9, regions.total_region_count() )
+		self.assertFalse( regions.is_covered( "chr7", 127471196 ))
+		for i in range(127471197, 127481699+1):
+			self.assertTrue( regions.is_covered( "chr7", i ))
+		self.assertFalse( regions.is_covered( "chr7", 127481700 ))
+
+	def test_Read3(self):
+
+		infile = "test/data/population/ucsc.bed";
+
+		import mylibgenesis.genesis.population;
+		reader = mylibgenesis.genesis.population.BedReader()
+		regions = reader.read_as_genome_region_list( from_file( infile ))
+		self.assertEqual( 2, regions.total_region_count() )
+		self.assertFalse( regions.is_covered( "chr22", 1000 ))
+		self.assertTrue(  regions.is_covered( "chr22", 1001 ))
+		self.assertTrue(  regions.is_covered( "chr22", 6000 ))
+		self.assertFalse( regions.is_covered( "chr22", 6001 ))
 
 if __name__ == '__main__':
 	unittest.main()

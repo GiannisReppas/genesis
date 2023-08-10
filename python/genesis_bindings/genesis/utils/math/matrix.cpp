@@ -1,3 +1,4 @@
+#include <genesis/population/genome_region_list.hpp>
 #include <genesis/utils/containers/interval_tree/interval.hpp>
 #include <genesis/utils/containers/matrix.hpp>
 #include <genesis/utils/math/matrix.hpp>
@@ -37,17 +38,8 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_math_statistics_2(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_math_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	// genesis::utils::spearmans_rank_correlation_coefficient(const class std::vector<double, class std::allocator<double> > &, const class std::vector<double, class std::allocator<double> > &) file:genesis/utils/math/statistics.hpp line:1300
-	M("genesis::utils").def("spearmans_rank_correlation_coefficient", (double (*)(const class std::vector<double, class std::allocator<double> > &, const class std::vector<double, class std::allocator<double> > &)) &genesis::utils::spearmans_rank_correlation_coefficient, "Calculate Spearman's Rank Correlation Coefficient between the entries of two vectors.\n\n  spearmans_rank_correlation_coefficient( RandomAccessIteratorA first_a, RandomAccessIteratorA last_a, RandomAccessIteratorB first_b, RandomAccessIteratorB last_b )\n\nC++: genesis::utils::spearmans_rank_correlation_coefficient(const class std::vector<double, class std::allocator<double> > &, const class std::vector<double, class std::allocator<double> > &) --> double", pybind11::arg("vec_a"), pybind11::arg("vec_b"));
-
-	// genesis::utils::fisher_transformation(double) file:genesis/utils/math/statistics.hpp line:1317
-	M("genesis::utils").def("fisher_transformation", (double (*)(double)) &genesis::utils::fisher_transformation, "Apply Fisher z-transformation to a correlation coefficient.\n\n The coefficient can be calculated with pearson_correlation_coefficient() or\n spearmans_rank_correlation_coefficient() and has to be in range `[ -1.0, 1.0 ]`.\n\n There is also a version of this function for a vector of coefficients.\n\nC++: genesis::utils::fisher_transformation(double) --> double", pybind11::arg("correlation_coefficient"));
-
-	// genesis::utils::fisher_transformation(const class std::vector<double, class std::allocator<double> > &) file:genesis/utils/math/statistics.hpp line:1337
-	M("genesis::utils").def("fisher_transformation", (class std::vector<double, class std::allocator<double> > (*)(const class std::vector<double, class std::allocator<double> > &)) &genesis::utils::fisher_transformation, "Apply Fisher z-transformation to a vector of correlation coefficients.\n\n See fisher_transformation( double ) for details.\n\nC++: genesis::utils::fisher_transformation(const class std::vector<double, class std::allocator<double> > &) --> class std::vector<double, class std::allocator<double> >", pybind11::arg("correlation_coefficients"));
-
 	// genesis::utils::normalize_cols(class genesis::utils::Matrix<double> &) file:genesis/utils/math/matrix.hpp line:262
 	M("genesis::utils").def("normalize_cols", (class std::vector<struct genesis::utils::MinMaxPair<double>, class std::allocator<struct genesis::utils::MinMaxPair<double> > > (*)(class genesis::utils::Matrix<double> &)) &genesis::utils::normalize_cols, "Normalize the columns of a Matrix so that all values are in the range `[ 0.0, 1.0 ]`.\n\n The Matrix is manipulated inline. For each column, the new values of the Matrix are calculated\n as \n\n.\n\n The function returns a vector containing the `min` and `max` values of the columns\n before normalization, see matrix_col_minmax().\n\n \n        Input data Matrix; normalization is done inline.\n \n\n            Vector containing the min and max values for each column before normalization.\n\nC++: genesis::utils::normalize_cols(class genesis::utils::Matrix<double> &) --> class std::vector<struct genesis::utils::MinMaxPair<double>, class std::allocator<struct genesis::utils::MinMaxPair<double> > >", pybind11::arg("data"));
 

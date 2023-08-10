@@ -47,12 +47,13 @@ void bind_genesis_utils_formats_svg_shapes_1(std::function< pybind11::module &(s
 void bind_genesis_utils_formats_nexus_writer(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_math_statistics(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_math_statistics_1(std::function< pybind11::module &(std::string const &namespace_) > &M);
-void bind_genesis_utils_math_statistics_2(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_math_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_interval_tree(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_interval_tree_node(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_interval_tree_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_interval_tree_node_1(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind____python_custom_bindings_template_instances_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_containers_lambda_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_sequence_functions_codes(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_sequence_counts(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_sequence_formats_phylip_reader(std::function< pybind11::module &(std::string const &namespace_) > &M);
@@ -109,6 +110,13 @@ void bind_genesis_placement_function_operators(std::function< pybind11::module &
 void bind_genesis_placement_simulator_distributions(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_population_genome_region(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_population_genome_locus_set(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_base_counts(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_formats_simple_pileup_input_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_formats_sync_reader(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_formats_variant_input_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_window_base_window(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_window_chromosome_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind____python_custom_bindings_template_instances_lambda_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
 
 
 PYBIND11_MODULE(mylibgenesis, root_module) {
@@ -184,12 +192,13 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_utils_formats_nexus_writer(M);
 	bind_genesis_utils_math_statistics(M);
 	bind_genesis_utils_math_statistics_1(M);
-	bind_genesis_utils_math_statistics_2(M);
+	bind_genesis_utils_math_matrix(M);
 	bind_genesis_utils_containers_interval_tree(M);
 	bind_genesis_utils_containers_interval_tree_node(M);
 	bind_genesis_utils_containers_interval_tree_iterator(M);
 	bind_genesis_utils_containers_interval_tree_node_1(M);
 	bind____python_custom_bindings_template_instances_matrix(M);
+	bind_genesis_utils_containers_lambda_iterator(M);
 	bind_genesis_sequence_functions_codes(M);
 	bind_genesis_sequence_counts(M);
 	bind_genesis_sequence_formats_phylip_reader(M);
@@ -246,5 +255,12 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_placement_simulator_distributions(M);
 	bind_genesis_population_genome_region(M);
 	bind_genesis_population_genome_locus_set(M);
+	bind_genesis_population_base_counts(M);
+	bind_genesis_population_formats_simple_pileup_input_iterator(M);
+	bind_genesis_population_formats_sync_reader(M);
+	bind_genesis_population_formats_variant_input_iterator(M);
+	bind_genesis_population_window_base_window(M);
+	bind_genesis_population_window_chromosome_iterator(M);
+	bind____python_custom_bindings_template_instances_lambda_iterator(M);
 
 }

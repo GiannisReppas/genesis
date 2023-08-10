@@ -1,3 +1,4 @@
+#include <genesis/population/genome_region_list.hpp>
 #include <genesis/utils/containers/interval_tree/functions.hpp>
 #include <genesis/utils/containers/interval_tree/interval.hpp>
 #include <genesis/utils/containers/interval_tree/iterator.hpp>

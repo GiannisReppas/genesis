@@ -1,6 +1,7 @@
 #include <functional>
 #include <genesis/population/genome_locus.hpp>
 #include <genesis/population/genome_region.hpp>
+#include <genesis/population/genome_region_list.hpp>
 #include <genesis/utils/containers/interval_tree.hpp>
 #include <genesis/utils/containers/interval_tree/interval.hpp>
 #include <genesis/utils/containers/interval_tree/iterator.hpp>
@@ -72,13 +73,13 @@ void bind_genesis_population_genome_region(std::function< pybind11::module &(std
 		cl.def("empty", (bool (genesis::population::GenomeLocus::*)() const) &genesis::population::GenomeLocus::empty, "C++: genesis::population::GenomeLocus::empty() const --> bool");
 		cl.def("specified", (bool (genesis::population::GenomeLocus::*)() const) &genesis::population::GenomeLocus::specified, "C++: genesis::population::GenomeLocus::specified() const --> bool");
 	}
-	{ // genesis::population::EmptyGenomeData file: line:56
+	{ // genesis::population::EmptyGenomeData file:genesis/population/genome_region_list.hpp line:56
 		pybind11::class_<genesis::population::EmptyGenomeData, std::shared_ptr<genesis::population::EmptyGenomeData>> cl(M("genesis::population"), "EmptyGenomeData", "Helper struct to define a default empty data for the classes GenomeLocus, GenomeRegion,\n and GenomeRegionList.");
 		cl.def( pybind11::init( [](genesis::population::EmptyGenomeData const &o){ return new genesis::population::EmptyGenomeData(o); } ) );
 		cl.def( pybind11::init( [](){ return new genesis::population::EmptyGenomeData(); } ) );
 		cl.def("assign", (struct genesis::population::EmptyGenomeData & (genesis::population::EmptyGenomeData::*)(const struct genesis::population::EmptyGenomeData &)) &genesis::population::EmptyGenomeData::operator=, "C++: genesis::population::EmptyGenomeData::operator=(const struct genesis::population::EmptyGenomeData &) --> struct genesis::population::EmptyGenomeData &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 	}
-	{ // genesis::population::GenomeRegionList file: line:95
+	{ // genesis::population::GenomeRegionList file:genesis/population/genome_region_list.hpp line:95
 		pybind11::class_<genesis::population::GenomeRegionList, std::shared_ptr<genesis::population::GenomeRegionList>> cl(M("genesis::population"), "GenomeRegionList", "List of regions in a genome, for each chromosome.\n\n The data structure stores a list of genome regions, such as coming from BED or GFF files.\n The class allows to iterate through the regions of each chromosome.\n\n It furtheremore allows querying positions, that is, whether a certain position on a chromosome\n is part of one of the stored regions. However, when many regions are stored in the list,\n and many queries need to be performed (such as when reading files and needing to check every\n position on every chromosome), this can become prohibitively slow, despite using a fast\n data structure. Use GenomeLocusSet as an alternative that is way faster when all that is needed\n is information on whether a certain position/coordinate is set or not set.\n\n Positions in the interval of each region are 1-based and inclusive, that is, we used closed\n intervals. We also offer the special case to add a whole chromosome as a region, in which case\n the is_covered() function will return `true` for all positions on that chromosome (without\n checking that the position is in fact part of the chromosome - as we do not use information\n on the lengths of chromosomes in this class). We use start and end positions equal to 0 to\n mark these special whole-chromosome cases - be aware of that when adding regions to the list.\n See also GenomeLocus, GenomeLocusSet, and GenomeRegion for related classes that have the same\n special cases.\n\n Interally, we use an \n\n\n\n\n\n\n\n");
 		cl.def( pybind11::init( [](){ return new genesis::population::GenomeRegionList(); } ) );
 		cl.def( pybind11::init( [](genesis::population::GenomeRegionList const &o){ return new genesis::population::GenomeRegionList(o); } ) );

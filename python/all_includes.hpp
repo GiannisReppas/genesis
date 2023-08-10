@@ -149,9 +149,6 @@
 #include <genesis/utils/formats/nexus/writer.hpp>
 #include <genesis/utils/formats/nexus/document.hpp>
 
-// utils/formats/xml/document
-#include <genesis/utils/formats/xml/document.hpp>
-
 // utils/math/matrix
 #include <genesis/utils/math/ranking.hpp>
 #include <genesis/utils/math/statistics.hpp>
@@ -170,6 +167,8 @@
 #include <../python/custom_bindings/template_instances/char_lookup.hpp>
 #include <../python/custom_bindings/template_instances/math_matrix.hpp>
 
+// lambda_iterator
+#include <genesis/utils/containers/lambda_iterator.hpp>
 
 /* sequence */
 
@@ -252,8 +251,6 @@
 #include <genesis/taxonomy/iterator/levelorder.hpp>
 #include <genesis/taxonomy/iterator/postorder.hpp>
 #include <genesis/taxonomy/iterator/preorder.hpp>
-//#include <../python/custom_bindings/template_instances/range.hpp>
-//#include <../python/custom_bindings/template_instances/preorder.hpp>
 // taxonomy/formats/taxonomy_reader , taxonomy/formats/taxopath_generator , taxonomy/formats/taxopath_parser , taxonomy/functions/taxonomy , taxonomy/functions/taxopath
 
 // printer test
@@ -272,13 +269,10 @@
 // taxonomy/taxon , taxonomy/taxonomy , taxonomy/taxopath , taxonomy/formats/taxopath_parser , taxonomy/formats/taxopath_generator , taxonomy/functions/taxonomy , taxonomy/functions/taxopath
 
 
-
-
 /* tree */
 
 
 // tree test
-
 #include <genesis/tree/tree/node_data.hpp>
 #include <genesis/tree/tree/edge_data.hpp>
 #include <genesis/tree/tree/link.hpp>
@@ -301,7 +295,6 @@
 /**********************************************************/
 
 // drawing test
-
 #include <genesis/tree/drawing/layout_tree.hpp> // tree/common_tree/tree , tree/tree , utils/formats/svg/svg
 #include <genesis/tree/drawing/layout_base.hpp> // tree/drawing/layout_tree , utils/formats/svg/svg
 #include <genesis/tree/drawing/heat_tree.hpp> // utils/containers/matrix , utils/formats/svg/svg , utils/tools/color , utils/tools/color/map , utils/tools/color/normalization , tree/common_tree/tree , tree/drawing/layout_base
@@ -310,12 +303,10 @@
 // tree/common_tree/newick_reader , tree/function/functions , tree/tree utils/core/fs ,  utils/formats/svg/svg , gutils/tools/color , utils/tools/color/names , utils/tools/color/norm_linear
 
 // functions test
-
 #include <genesis/tree/common_tree/functions.hpp>
 // tree/common_tree/newick_reader , tree/common_tree/tree , tree/formats/newick/reader , tree/function/functions , tree/tree , utils/text/string , utils/containers/matrix/operators
 
 // manipulation test
-
 #include <genesis/tree/function/manipulation.hpp>
 #include <genesis/tree/printer/compact.hpp>
 #include <genesis/tree/printer/detailed.hpp>
@@ -332,7 +323,6 @@
 // utils/containers/matrix/operators , utils/math/common , utils/text/string  , tree/common_tree/newick_reader
 
 // newick test
-
 #include <genesis/tree/formats/newick/writer.hpp>
 #include <genesis/tree/common_tree/newick_writer.hpp> // tree/common_tree/tree , tree/formats/newick/element , tree/function/functions , tree/formats/newick/writer , utils/core/std , utils/text/string
 #include <genesis/tree/formats/color_writer_plugin.hpp> // utils/tools/color , utils/tools/color/functions
@@ -346,62 +336,51 @@
 // tree/common_tree/newick_reader , tree/function/functions , tree/function/operators , tree/tree , tree/formats/newick/reader , utils/io/input_stream , utils/text/string
 
 // printer test
-
 #include <genesis/tree/printer/table.hpp>
 // tree/common_tree/newick_reader , tree/formats/newick/reader , tree/printer/compact , tree/printer/detailed , tree/tree
 
 // attribute_tree/newick_reader test
-
 #include <genesis/tree/attribute_tree/tree.hpp> // tree/tree , tree/common_tree/tree , tree/function/operators
 #include <genesis/tree/attribute_tree/indexed_newick_reader.hpp> // tree/attribute_tree/tree , tree/common_tree/newick_reader , tree/formats/newick/element , tree/formats/newick/reader
 #include <genesis/tree/attribute_tree/keyed_newick_reader.hpp> // tree/attribute_tree/tree , tree/common_tree/newick_reader , tree/formats/newick/element , tree/formats/newick/reader
 // tree/function/functions.hpp" , tree/formats/newick/reader.hpp" , tree/tree.hpp"
 
 // common_tree/common_tree test
-
 #include <genesis/tree/common_tree/distances.hpp> // tree/common_tree/tree , utils/containers/matrix
 #include <genesis/tree/common_tree/edge_color.hpp>
 // utils/tools/color , utils/tools/color/functions , tree/common_tree/functions , tree/common_tree/newick_reader , tree/function/functions , tree/formats/newick/reader , tree/tree
 
 // common_tree/distances test
-
 #include <genesis/tree/function/distances.hpp> // utils/containers/matrix
 // tree/common_tree/distances , tree/common_tree/functions , tree/common_tree/newick_reader , tree/function/functions , tree/formats/newick/reader , tree/tree , utils/containers/matrix , utils/containers/matrix/operators
 
 // common_tree/rf test
-
 #include <genesis/tree/bipartition/rf.hpp> // tree/tree , tree/tree_set , utils/containers/matrix , utils/math/bitvector
 // tree/common_tree/distances , tree/common_tree/newick_reader , tree/function/functions , tree/tree_set , tree/tree , utils/containers/matrix/operators
 
 // iterator/path test
-
 #include <genesis/tree/iterator/path.hpp> // utils/containers/range , tree/tree , tree/function/functions
 #include <../python/custom_bindings/template_instances/path.hpp>
 // tree/tree , tree/formats/newick/reader , tree/common_tree/newick_reader , tree/common_tree/functions
 
 // iterator/path_set test
-
 #include <genesis/tree/iterator/path_set.hpp> // utils/containers/range , tree/function/functions , tree/tree
 #include <../python/custom_bindings/template_instances/path_set.hpp>
 // tree/tree , common_tree/functions , common_tree/newick_reader , formats/newick/reade
 
 // iterator/eulertour test
-
 //#include <genesis/tree/iterator/eulertour.hpp> // utils/containers/range , tree/tree/subtree , tree/tree
 // tree/tree , tree/formats/newick/reader , tree/common_tree/newick_reader , tree/common_tree/functions , tree/common_tree/tree
 
 // iterator/levelorder test
-
 //#include <genesis/tree/iterator/levelorder.hpp> // utils/containers/range , tree/tree/subtree , tree/tree
 // tree/tree , utils/text/string , tree/formats/newick/reader , tree/common_tree/tree , tree/common_tree/newick_reader ,tree/common_tree/functions
 
 // iterator/postorder test
-
 //#include <genesis/tree/iterator/postorder.hpp> // utils/containers/range , tree/tree/subtree , tree/tree
 // tree/tree , tree/formats/newick/reader , tree/common_tree/newick_reader , tree/common_tree/functions , tree/common_tree/tree
 
 // iterator/preorder test
-
 //#include <genesis/tree/iterator/preorder.hpp> // utils/containers/range , tree/tree/subtree , tree/tree
 // tree/tree , tree/common_tree/tree , tree/common_tree/functions , tree/common_tree/newick_reader , tree/formats/newick/reader
 
@@ -410,7 +389,6 @@
 
 
 // jplace_reader test
-
 #include <genesis/placement/formats/jplace_reader.hpp> // utils/io/input_source
 #include <genesis/placement/placement_tree.hpp> // tree/common_tree/tree , tree/tree
 #include <genesis/placement/pquery/name.hpp>
@@ -421,17 +399,14 @@
 #include <genesis/placement/function/functions.hpp> // placement/sample , placement/sample_set , utils/containers/matrix
 #include <genesis/placement/pquery/plain.hpp>
 #include <genesis/placement/function/helper.hpp> // placement/sample , placement/sample_set , placement/pquery/plain , utils/containers/matrix
-
 #include <../python/custom_bindings/template_instances/range.hpp>
 #include <../python/custom_bindings/template_instances/preorder.hpp>
 
 // jplace_write test
-
 #include <genesis/placement/formats/jplace_writer.hpp> // utils/io/output_target
 // utils/core/fs , placement/sample , placement/function/helper , placement/function/functions , placement/formats/jplace_reader
 
 // measures test
-
 #include <genesis/placement/placement_tree.hpp> // tree/common_tree/tree , tree/tree
 #include <genesis/placement/function/cog.hpp> // placement/placement_tree
 #include <genesis/placement/function/emd.hpp>
@@ -440,26 +415,22 @@
 // utils/containers/matrix , placement/sample , placement/sample_set , placement/formats/jplace_reader
 
 // serializer test
-
 #include <genesis/placement/formats/serializer.hpp>
 // placement/formats/jplace_reader , placement/function/functions , placement/function/helper , placement/sample
 
 // edge_color test
-
 #include <genesis/placement/formats/edge_color.hpp>
 #include <genesis/placement/formats/newick_writer.hpp> // placement/function/helper , placement/placement_tree , placement/sample , tree/common_tree/newick_writer , tree/formats/newick/writer
 // utils/formats/nexus/document , utils/formats/nexus/taxa , utils/formats/nexus/trees , utils/formats/nexus/writer , placement/formats/jplace_reader , placement/sample
 // tree/formats/phyloxml/writer , tree/common_tree/functions , tree/common_tree/phyloxml_writer , tree/formats/newick/color_writer_plugin , tree/formats/phyloxml/color_writer_plugin
 
 // epca test
-
 #include <genesis/placement/function/epca.hpp> // placement/placement_tree , utils/containers/matrix
 #include <genesis/placement/function/masses.hpp> // placement/sample , placement/sample_set , utils/containers/matrix
 // tree/function/functions , utils/core/fs , utils/formats/csv/reader , utils/containers/matrix , utils/containers/matrix/operators , utils/math/matrix , utils/text/string
 // placement/formats/jplace_reader , placement/function/functions , placement/function/helper , placement/function/measures , placement/sample_set , placement/sample
 
 // functions test
-
 #include <genesis/placement/formats/newick_reader.hpp> // utils/core/logging , placement/function/helper , placement/placement_tree
 #include <genesis/placement/function/operators.hpp> // placement/placement_tree
 #include <genesis/placement/function/tree.hpp>
@@ -467,7 +438,6 @@
 // tree/common_tree/tree , tree/common_tree/newick_writer , tree/formats/newick/writer
 
 // manipulation test
-
 //#include <genesis/tree/function/manipulation.hpp>
 //#include <genesis/tree/iterator/levelorder.hpp>
 //#include <genesis/placement/function/manipulation.hpp>
@@ -475,11 +445,9 @@
 // tree/function/manipulation , tree/common_tree/functions , tree/common_tree/newick_reader , tree/common_tree/tree , tree/formats/newick/reader , tree/iterator/levelorder , tree/tree
 
 //sample test
-
 // placement/formats/jplace_reader , placement/formats/newick_reader , placement/function/functions , placement/function/helper , placement/function/operators , placement/sample , tree/formats/newick/reader
 
 // simulator test
-
 #include <genesis/placement/simulator/distributions.hpp> // placement/sample , utils/core/options
 #include <genesis/placement/simulator/functions.hpp>
 #include <genesis/placement/simulator/simulator.hpp> // placement/sample , placement/simulator/distributions
@@ -490,10 +458,38 @@
 /* population */
 
 
-// bad_reader test
+// bed_reader test
 #include <genesis/population/genome_region.hpp>
 #include <genesis/population/genome_locus.hpp>
+#include <genesis/population/genome_region_list.hpp> // population/genome_locus , population/genome_region , utils/containers/interval_tree
 #include <genesis/population/genome_locus_set.hpp> // population/genome_locus , population/genome_region , population/genome_region_list , utils/math/bitvector
-#include <genesis/population/genome_region_list.hpp> // population/genome_locus , utils/containers/interval_tree
 #include <genesis/population/formats/bed_reader.hpp>
 // utils/io/input_source , utils/io/input_stream
+
+// chromosome_iterator test
+#include <genesis/population/base_counts.hpp>
+#include <genesis/population/variant.hpp> // population/base_counts
+#include <genesis/population/formats/simple_pileup_reader.hpp> // utils/io/input_stream , utils/io/input_source , sequence/functions/quality , population/variant
+#include <genesis/population/formats/simple_pileup_input_iterator.hpp> // utils/io/input_source , utils/math/bitvector/helper , population/formats/simple_pileup_reader
+#include <genesis/population/formats/frequency_table_input_iterator.hpp> // population/variant , sequence/reference_genome , utils/io/input_source , utils/io/input_stream
+#include <genesis/population/formats/sam_variant_input_iterator.hpp> // population/base_counts , population/functions/genome_locus , population/genome_locus_set , population/genome_locus , population/variant , utils/core/fs
+#include <genesis/population/formats/sync_reader.hpp> // population/variant , utils/io/input_source , utils/io/input_stream
+#include <genesis/population/formats/sync_input_iterator.hpp> // utils/io/input_source , population/formats/sync_reader
+#include <genesis/population/formats/hts_file.hpp>
+#include <genesis/population/formats/vcf_common.hpp> // population/genome_locus_set , population/genome_region , population/genome_region_list
+#include <genesis/population/formats/vcf_header.hpp> // population/formats/hts_file , population/formats/vcf_common
+#include <genesis/population/formats/vcf_format_iterator.hpp> // population/formats/vcf_common , population/formats/vcf_header
+#include <genesis/population/formats/vcf_record.hpp> // utils/containers/range , population/formats/vcf_header , population/formats/vcf_common , population/formats/vcf_format_iterator
+#include <genesis/population/formats/vcf_input_iterator.hpp> // population/formats/hts_file , population/formats/vcf_header , population/formats/vcf_record
+#include <genesis/population/formats/variant_input_iterator.hpp>  // utils/containers/lambda_iterator , population/variant , /population/base_counts , population/formats/simple_pileup_input_iterator , population/formats/frequency_table_input_iterator , population/formats/sam_variant_input_iterator , population/formats/sync_reader , population/formats/sync_input_iterator , population/formats/vcf_input_iterator
+#include <genesis/population/window/base_window.hpp> // population/genome_region
+#include <genesis/population/window/window.hpp>  // population/genome_region , population/window/base_window
+#include <genesis/population/window/window_view.hpp> // population/window/window , population/window/base_window
+#include <genesis/population/window/functions.hpp> // population/window/window , population/window/window_view , population/window/base_window
+#include <genesis/population/window/base_window_iterator.hpp> // utils/core/std , utils/containers/range , population/window/window.
+#include <genesis/population/window/chromosome_iterator.hpp> // population/window/window_view , population/window/base_window_iterator
+// utils/containers/lambda_iterator
+
+// template instances
+#include <../python/custom_bindings/template_instances/lambda_iterator.hpp>
+#include <../python/custom_bindings/template_instances/chromosome_iterator.hpp>

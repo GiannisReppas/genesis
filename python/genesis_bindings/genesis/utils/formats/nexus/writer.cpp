@@ -1,7 +1,6 @@
 #include <genesis/utils/formats/nexus/block.hpp>
 #include <genesis/utils/formats/nexus/document.hpp>
 #include <genesis/utils/formats/nexus/writer.hpp>
-#include <genesis/utils/formats/xml/document.hpp>
 #include <genesis/utils/io/base_output_target.hpp>
 #include <genesis/utils/math/ranking.hpp>
 #include <genesis/utils/math/statistics.hpp>
@@ -59,12 +58,6 @@ void bind_genesis_utils_formats_nexus_writer(std::function< pybind11::module &(s
 		cl.def("begin", (class __gnu_cxx::__normal_iterator<const class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > *, class std::vector<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> >, class std::allocator<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > > > > (genesis::utils::NexusDocument::*)() const) &genesis::utils::NexusDocument::begin, "C++: genesis::utils::NexusDocument::begin() const --> class __gnu_cxx::__normal_iterator<const class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > *, class std::vector<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> >, class std::allocator<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > > > >");
 		cl.def("end", (class __gnu_cxx::__normal_iterator<const class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > *, class std::vector<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> >, class std::allocator<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > > > > (genesis::utils::NexusDocument::*)() const) &genesis::utils::NexusDocument::end, "C++: genesis::utils::NexusDocument::end() const --> class __gnu_cxx::__normal_iterator<const class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > *, class std::vector<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> >, class std::allocator<class std::unique_ptr<class genesis::utils::NexusBlock, struct std::default_delete<class genesis::utils::NexusBlock> > > > >");
 	}
-	{ // genesis::utils::XmlDocument file:genesis/utils/formats/xml/document.hpp line:219
-		pybind11::class_<genesis::utils::XmlDocument, std::shared_ptr<genesis::utils::XmlDocument>> cl(M("genesis::utils"), "XmlDocument", "");
-		cl.def_readwrite("xml_tag", &genesis::utils::XmlDocument::xml_tag);
-		cl.def_readwrite("declarations", &genesis::utils::XmlDocument::declarations);
-		cl.def("clear", (void (genesis::utils::XmlDocument::*)()) &genesis::utils::XmlDocument::clear, "C++: genesis::utils::XmlDocument::clear() --> void");
-	}
 	// genesis::utils::ranking_standard(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >) file:genesis/utils/math/ranking.hpp line:59
 	M("genesis::utils").def("ranking_standard", (class std::vector<unsigned long, class std::allocator<unsigned long> > (*)(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >)) &genesis::utils::ranking_standard<__gnu_cxx::__normal_iterator<const double *, std::vector<double, std::allocator<double> > >>, "C++: genesis::utils::ranking_standard(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >) --> class std::vector<unsigned long, class std::allocator<unsigned long> >", pybind11::arg("first"), pybind11::arg("last"));
 
@@ -119,4 +112,7 @@ void bind_genesis_utils_formats_nexus_writer(std::function< pybind11::module &(s
 		cl.def_readwrite("q3", &genesis::utils::Quartiles::q3);
 		cl.def_readwrite("q4", &genesis::utils::Quartiles::q4);
 	}
+	// genesis::utils::closure(class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >) file:genesis/utils/math/statistics.hpp line:288
+	M("genesis::utils").def("closure", (void (*)(class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >)) &genesis::utils::closure<__gnu_cxx::__normal_iterator<double *, std::vector<double, std::allocator<double> > >>, "C++: genesis::utils::closure(class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<double *, class std::vector<double, class std::allocator<double> > >) --> void", pybind11::arg("first"), pybind11::arg("last"));
+
 }
