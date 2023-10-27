@@ -22,7 +22,7 @@ void bind_std_random(std::function< pybind11::module &(std::string const &namesp
 void bind_genesis_utils_math_bitvector(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_std_genesis_utils_math_bitvector(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_math_bitvector_helper(std::function< pybind11::module &(std::string const &namespace_) > &M);
-void bind_genesis_utils_tools_color_functions(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_color_functions(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_range(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_matrix_1(std::function< pybind11::module &(std::string const &namespace_) > &M);
@@ -36,7 +36,7 @@ void bind_genesis_utils_text_string_1(std::function< pybind11::module &(std::str
 void bind_genesis_utils_text_string_2(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_io_gzip_block_ostream(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_math_common(std::function< pybind11::module &(std::string const &namespace_) > &M);
-void bind_genesis_utils_tools_color_names(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_color_names(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_tools_tickmarks(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_formats_svg_helper(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_formats_svg_attributes(std::function< pybind11::module &(std::string const &namespace_) > &M);
@@ -116,6 +116,7 @@ void bind_genesis_population_formats_sync_reader(std::function< pybind11::module
 void bind_genesis_population_formats_variant_input_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_population_window_base_window(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_population_window_chromosome_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_population_functions_functions(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind____python_custom_bindings_template_instances_lambda_iterator(std::function< pybind11::module &(std::string const &namespace_) > &M);
 
 
@@ -167,7 +168,7 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_utils_math_bitvector(M);
 	bind_std_genesis_utils_math_bitvector(M);
 	bind_genesis_utils_math_bitvector_helper(M);
-	bind_genesis_utils_tools_color_functions(M);
+	bind_genesis_utils_color_functions(M);
 	bind_genesis_utils_containers_range(M);
 	bind_genesis_utils_containers_matrix(M);
 	bind_genesis_utils_containers_matrix_1(M);
@@ -181,7 +182,7 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_utils_text_string_2(M);
 	bind_genesis_utils_io_gzip_block_ostream(M);
 	bind_genesis_utils_math_common(M);
-	bind_genesis_utils_tools_color_names(M);
+	bind_genesis_utils_color_names(M);
 	bind_genesis_utils_tools_tickmarks(M);
 	bind_genesis_utils_formats_svg_helper(M);
 	bind_genesis_utils_formats_svg_attributes(M);
@@ -261,6 +262,7 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_population_formats_variant_input_iterator(M);
 	bind_genesis_population_window_base_window(M);
 	bind_genesis_population_window_chromosome_iterator(M);
+	bind_genesis_population_functions_functions(M);
 	bind____python_custom_bindings_template_instances_lambda_iterator(M);
 
 }

@@ -2,13 +2,18 @@
 #include <functional>
 #include <genesis/population/base_counts.hpp>
 #include <genesis/population/formats/simple_pileup_reader.hpp>
+#include <genesis/population/functions/functions.hpp>
 #include <genesis/population/variant.hpp>
 #include <genesis/sequence/functions/quality.hpp>
 #include <genesis/utils/io/base_input_source.hpp>
 #include <genesis/utils/io/input_stream.hpp>
+#include <ios>
 #include <iterator>
+#include <locale>
 #include <memory>
+#include <ostream>
 #include <sstream> // __str__
+#include <streambuf>
 #include <string>
 #include <utility>
 #include <vector>
@@ -18,7 +23,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -32,6 +37,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -56,6 +62,8 @@ void bind_genesis_population_base_counts(std::function< pybind11::module &(std::
 		cl.def_readwrite("d_count", &genesis::population::BaseCounts::d_count);
 		cl.def("clear", (void (genesis::population::BaseCounts::*)()) &genesis::population::BaseCounts::clear, "Reset all counts to 0.\n\nC++: genesis::population::BaseCounts::clear() --> void");
 		cl.def("assign", (struct genesis::population::BaseCounts & (genesis::population::BaseCounts::*)(const struct genesis::population::BaseCounts &)) &genesis::population::BaseCounts::operator=, "C++: genesis::population::BaseCounts::operator=(const struct genesis::population::BaseCounts &) --> struct genesis::population::BaseCounts &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
+
+		cl.def("__str__", [](genesis::population::BaseCounts const &o) -> std::string { std::ostringstream s; genesis::population::operator<<(s, o); return s.str(); } );
 	}
 	{ // genesis::population::SortedBaseCounts file:genesis/population/base_counts.hpp line:115
 		pybind11::class_<genesis::population::SortedBaseCounts, std::shared_ptr<genesis::population::SortedBaseCounts>> cl(M("genesis::population"), "SortedBaseCounts", "Ordered array of base counts for the four nucleotides.\n\n Some functions need the bases sorted by their count. This structure is used to keep that data,\n with the highest count base first.");

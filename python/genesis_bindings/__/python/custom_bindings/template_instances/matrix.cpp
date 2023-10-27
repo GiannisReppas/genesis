@@ -2,10 +2,10 @@
 #include <../python/custom_bindings/template_instances/math_matrix.hpp>
 #include <../python/custom_bindings/template_instances/matrix.hpp>
 #include <functional>
+#include <genesis/utils/color/color.hpp>
 #include <genesis/utils/containers/matrix.hpp>
 #include <genesis/utils/containers/matrix/row.hpp>
 #include <genesis/utils/tools/char_lookup.hpp>
-#include <genesis/utils/tools/color.hpp>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -16,7 +16,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -30,6 +30,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 

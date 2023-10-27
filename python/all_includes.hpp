@@ -50,11 +50,11 @@
 #include <genesis/utils/math/bitvector/helper.hpp>
 #include <genesis/utils/math/bitvector/operators.hpp>
 
-// utils/tools/color
-#include <genesis/utils/tools/color.hpp>
+// utils/color
+#include <genesis/utils/color/color.hpp>
 
-// utils/tools/color/functions
-#include <genesis/utils/tools/color/functions.hpp>
+// utils/color/functions
+#include <genesis/utils/color/functions.hpp>
 
 // utils/core/algorithm
 #include <genesis/utils/core/algorithm.hpp>
@@ -116,14 +116,14 @@
 // utils/containers/deref_iterator
 #include <genesis/utils/containers/deref_iterator.hpp>
 
-// utils/tools/color/names
-#include <genesis/utils/tools/color/names.hpp>
+// utils/color/names
+#include <genesis/utils/color/names.hpp>
 
-// utils/tools/color/norm_linear
-#include <genesis/utils/tools/color/map.hpp>
-#include <genesis/utils/tools/color/normalization.hpp>
+// utils/color/norm_linear
+#include <genesis/utils/color/map.hpp>
+#include <genesis/utils/color/normalization.hpp>
 #include <genesis/utils/tools/tickmarks.hpp>
-#include <genesis/utils/tools/color/norm_linear.hpp>
+#include <genesis/utils/color/norm_linear.hpp>
 
 // utils/formats/svg/svg
 #include <genesis/utils/formats/svg/helper.hpp>
@@ -489,6 +489,16 @@
 #include <genesis/population/window/base_window_iterator.hpp> // utils/core/std , utils/containers/range , population/window/window.
 #include <genesis/population/window/chromosome_iterator.hpp> // population/window/window_view , population/window/base_window_iterator
 // utils/containers/lambda_iterator
+
+// variant test
+#include <genesis/population/functions/functions.hpp> // population/base_counts , population/variant , sequence/reference_genome , utils/text/char
+// population/variant , population/formats/vcf_common , population/formats/vcf_header , population/formats/vcf_record
+
+// functions test
+// population/base_counts , population/variant , population/functions/functions , sequence/reference_genom
+
+// vcf basics test
+// population/formats/hts_file , population/formats/vcf_common , population/formats/vcf_header , population/formats/vcf_input_iterator , population/formats/vcf_record , utils/text/string
 
 // template instances
 #include <../python/custom_bindings/template_instances/lambda_iterator.hpp>

@@ -1,5 +1,5 @@
+#include <genesis/utils/color/norm_linear.hpp>
 #include <genesis/utils/formats/svg/helper.hpp>
-#include <genesis/utils/tools/color/norm_linear.hpp>
 #include <genesis/utils/tools/tickmarks.hpp>
 #include <iterator>
 #include <memory>
@@ -12,7 +12,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -26,6 +26,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -36,7 +37,7 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-// genesis::utils::ColorNormalizationLinear file:genesis/utils/tools/color/norm_linear.hpp line:59
+// genesis::utils::ColorNormalizationLinear file:genesis/utils/color/norm_linear.hpp line:59
 struct PyCallBack_genesis_utils_ColorNormalizationLinear : public genesis::utils::ColorNormalizationLinear {
 	using genesis::utils::ColorNormalizationLinear::ColorNormalizationLinear;
 
@@ -122,7 +123,7 @@ void bind_genesis_utils_tools_tickmarks(std::function< pybind11::module &(std::s
 		}
 
 	}
-	{ // genesis::utils::ColorNormalizationLinear file:genesis/utils/tools/color/norm_linear.hpp line:59
+	{ // genesis::utils::ColorNormalizationLinear file:genesis/utils/color/norm_linear.hpp line:59
 		pybind11::class_<genesis::utils::ColorNormalizationLinear, std::shared_ptr<genesis::utils::ColorNormalizationLinear>, PyCallBack_genesis_utils_ColorNormalizationLinear, genesis::utils::ColorNormalization> cl(M("genesis::utils"), "ColorNormalizationLinear", "Default Color normalization, using a sequential linear scaling in the\n range `[ min, max ]`.");
 		cl.def( pybind11::init( [](){ return new genesis::utils::ColorNormalizationLinear(); }, [](){ return new PyCallBack_genesis_utils_ColorNormalizationLinear(); } ) );
 		cl.def( pybind11::init<double, double>(), pybind11::arg("min"), pybind11::arg("max") );

@@ -3,7 +3,7 @@
 
 #include "genesis/utils/containers/matrix.hpp"
 #include "genesis/utils/containers/matrix/operators.hpp"
-#include "genesis/utils/tools/color.hpp"
+#include "genesis/utils/color/color.hpp"
 
 template<class T>
 inline void extend_matrix( pybind11::class_<T, std::shared_ptr<T> >& cl )

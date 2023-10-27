@@ -23,7 +23,7 @@ add_library(mylibgenesis SHARED
 	genesis/utils/math/bitvector.cpp
 	std/genesis/utils/math/bitvector.cpp
 	genesis/utils/math/bitvector/helper.cpp
-	genesis/utils/tools/color/functions.cpp
+	genesis/utils/color/functions.cpp
 	genesis/utils/containers/range.cpp
 	genesis/utils/containers/matrix.cpp
 	genesis/utils/containers/matrix_1.cpp
@@ -37,7 +37,7 @@ add_library(mylibgenesis SHARED
 	genesis/utils/text/string_2.cpp
 	genesis/utils/io/gzip_block_ostream.cpp
 	genesis/utils/math/common.cpp
-	genesis/utils/tools/color/names.cpp
+	genesis/utils/color/names.cpp
 	genesis/utils/tools/tickmarks.cpp
 	genesis/utils/formats/svg/helper.cpp
 	genesis/utils/formats/svg/attributes.cpp
@@ -117,6 +117,7 @@ add_library(mylibgenesis SHARED
 	genesis/population/formats/variant_input_iterator.cpp
 	genesis/population/window/base_window.cpp
 	genesis/population/window/chromosome_iterator.cpp
+	genesis/population/functions/functions.cpp
 	__/python/custom_bindings/template_instances/lambda_iterator.cpp
 )
 target_link_libraries(mylibgenesis PUBLIC /home/giannis/Desktop/genesis/bin/libgenesis.so )

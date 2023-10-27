@@ -12,14 +12,14 @@
 #include <genesis/tree/tree/link.hpp>
 #include <genesis/tree/tree/node.hpp>
 #include <genesis/tree/tree/node_data.hpp>
+#include <genesis/utils/color/color.hpp>
+#include <genesis/utils/color/map.hpp>
+#include <genesis/utils/color/normalization.hpp>
 #include <genesis/utils/containers/deref_iterator.hpp>
 #include <genesis/utils/containers/range.hpp>
 #include <genesis/utils/formats/svg/document.hpp>
 #include <genesis/utils/formats/svg/helper.hpp>
 #include <genesis/utils/formats/svg/object.hpp>
-#include <genesis/utils/tools/color.hpp>
-#include <genesis/utils/tools/color/map.hpp>
-#include <genesis/utils/tools/color/normalization.hpp>
 #include <ios>
 #include <iterator>
 #include <memory>
@@ -34,7 +34,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -48,6 +48,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 

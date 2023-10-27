@@ -1,4 +1,5 @@
 #include <genesis/population/formats/variant_input_iterator.hpp>
+#include <genesis/population/functions/functions.hpp>
 #include <genesis/population/variant.hpp>
 #include <genesis/population/window/chromosome_iterator.hpp>
 #include <genesis/utils/containers/lambda_iterator.hpp>
@@ -9,7 +10,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -23,6 +24,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -58,7 +60,10 @@ void bind_genesis_population_window_chromosome_iterator(std::function< pybind11:
 		}
 
 	}
-	// genesis::population::make_default_chromosome_iterator(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator) file:genesis/population/window/chromosome_iterator.hpp line:479
-	M("genesis::population").def("make_default_chromosome_iterator", (class genesis::population::ChromosomeIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant> (*)(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator)) &genesis::population::make_default_chromosome_iterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator>, "C++: genesis::population::make_default_chromosome_iterator(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator) --> class genesis::population::ChromosomeIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant>", pybind11::arg("begin"), pybind11::arg("end"));
+	// genesis::population::make_chromosome_iterator(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator) file:genesis/population/window/chromosome_iterator.hpp line:460
+	M("genesis::population").def("make_chromosome_iterator", (class genesis::population::ChromosomeIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant> (*)(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator)) &genesis::population::make_chromosome_iterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant>, "C++: genesis::population::make_chromosome_iterator(class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator) --> class genesis::population::ChromosomeIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant>", pybind11::arg("begin"), pybind11::arg("end"));
+
+	// genesis::population::is_valid_base(char) file:genesis/population/functions/functions.hpp line:55
+	M("genesis::population").def("is_valid_base", (bool (*)(char)) &genesis::population::is_valid_base, "Return whether a given base is in `ACGT`, case insensitive.\n\nC++: genesis::population::is_valid_base(char) --> bool", pybind11::arg("c"));
 
 }

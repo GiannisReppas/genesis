@@ -1,8 +1,8 @@
+#include <genesis/utils/color/color.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <genesis/utils/math/bitvector.hpp>
 #include <genesis/utils/math/bitvector/helper.hpp>
 #include <genesis/utils/math/bitvector/operators.hpp>
-#include <genesis/utils/tools/color.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
 #include <ios>
 #include <iterator>
 #include <locale>
@@ -18,7 +18,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -32,6 +32,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -78,7 +79,7 @@ void bind_genesis_utils_math_bitvector_helper(std::function< pybind11::module &(
 	// genesis::utils::is_superset(const class genesis::utils::Bitvector &, const class genesis::utils::Bitvector &) file:genesis/utils/math/bitvector/operators.hpp line:91
 	M("genesis::utils").def("is_superset", (bool (*)(const class genesis::utils::Bitvector &, const class genesis::utils::Bitvector &)) &genesis::utils::is_superset, "Superset or equal.\n\nC++: genesis::utils::is_superset(const class genesis::utils::Bitvector &, const class genesis::utils::Bitvector &) --> bool", pybind11::arg("super"), pybind11::arg("sub"));
 
-	{ // genesis::utils::Color file:genesis/utils/tools/color.hpp line:47
+	{ // genesis::utils::Color file:genesis/utils/color/color.hpp line:47
 		pybind11::class_<genesis::utils::Color, std::shared_ptr<genesis::utils::Color>> cl(M("genesis::utils"), "Color", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Color(); } ) );
 		cl.def( pybind11::init<double, double, double>(), pybind11::arg("r"), pybind11::arg("g"), pybind11::arg("b") );
@@ -111,18 +112,21 @@ void bind_genesis_utils_math_bitvector_helper(std::function< pybind11::module &(
 
 		cl.def("__str__", [](genesis::utils::Color const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
 	}
-	// genesis::utils::color_from_bytes(unsigned char, unsigned char, unsigned char, unsigned char) file:genesis/utils/tools/color/functions.hpp line:56
+	// genesis::utils::color_from_bytes(unsigned char, unsigned char, unsigned char, unsigned char) file:genesis/utils/color/functions.hpp line:56
 	M("genesis::utils").def("color_from_bytes", [](unsigned char const & a0, unsigned char const & a1, unsigned char const & a2) -> genesis::utils::Color { return genesis::utils::color_from_bytes(a0, a1, a2); }, "", pybind11::arg("r"), pybind11::arg("g"), pybind11::arg("b"));
 	M("genesis::utils").def("color_from_bytes", (class genesis::utils::Color (*)(unsigned char, unsigned char, unsigned char, unsigned char)) &genesis::utils::color_from_bytes, "Create a Color given three or four values in the range `[ 0, 255 ]` for each\n of the components red, green and blue, and optionally alpha.\n\nC++: genesis::utils::color_from_bytes(unsigned char, unsigned char, unsigned char, unsigned char) --> class genesis::utils::Color", pybind11::arg("r"), pybind11::arg("g"), pybind11::arg("b"), pybind11::arg("a"));
 
-	// genesis::utils::color_from_hex(const std::string &, const std::string &) file:genesis/utils/tools/color/functions.hpp line:65
+	// genesis::utils::color_from_hex(const std::string &, const std::string &) file:genesis/utils/color/functions.hpp line:65
 	M("genesis::utils").def("color_from_hex", [](const std::string & a0) -> genesis::utils::Color { return genesis::utils::color_from_hex(a0); }, "", pybind11::arg("hex_color"));
 	M("genesis::utils").def("color_from_hex", (class genesis::utils::Color (*)(const std::string &, const std::string &)) &genesis::utils::color_from_hex, "Create a Color given a hex color string in the format \"#003366[ff]\".\n\n The hash sign in the beginning can be replaced by any given prefix.\n If the string is not correctly formatted, an std::invalid_argument exception is thrown.\n If the string contains only RGB, alpha is set to `1.0`.\n\nC++: genesis::utils::color_from_hex(const std::string &, const std::string &) --> class genesis::utils::Color", pybind11::arg("hex_color"), pybind11::arg("prefix"));
 
-	// genesis::utils::color_to_hex(const class genesis::utils::Color &, const std::string &, bool, bool) file:genesis/utils/tools/color/functions.hpp line:75
+	// genesis::utils::color_to_hex(const class genesis::utils::Color &, const std::string &, bool, bool) file:genesis/utils/color/functions.hpp line:75
 	M("genesis::utils").def("color_to_hex", [](const class genesis::utils::Color & a0) -> std::string { return genesis::utils::color_to_hex(a0); }, "", pybind11::arg("c"));
 	M("genesis::utils").def("color_to_hex", [](const class genesis::utils::Color & a0, const std::string & a1) -> std::string { return genesis::utils::color_to_hex(a0, a1); }, "", pybind11::arg("c"), pybind11::arg("prefix"));
 	M("genesis::utils").def("color_to_hex", [](const class genesis::utils::Color & a0, const std::string & a1, bool const & a2) -> std::string { return genesis::utils::color_to_hex(a0, a1, a2); }, "", pybind11::arg("c"), pybind11::arg("prefix"), pybind11::arg("uppercase"));
 	M("genesis::utils").def("color_to_hex", (std::string (*)(const class genesis::utils::Color &, const std::string &, bool, bool)) &genesis::utils::color_to_hex, "Return a hex string representation of a Color in the format \"#003366[ff]\".\n\n The hash sign in the beginning can be replaced by any given \n If  is set to `true`, any outputted alphabetical chars\n (that is, A to F for hex strings) are uppercase.\n if  is set to `true`, two additional hex digits are printed for the alpha channel.\n\nC++: genesis::utils::color_to_hex(const class genesis::utils::Color &, const std::string &, bool, bool) --> std::string", pybind11::arg("c"), pybind11::arg("prefix"), pybind11::arg("uppercase"), pybind11::arg("with_alpha"));
+
+	// genesis::utils::resolve_color_string(const std::string &) file:genesis/utils/color/functions.hpp line:97
+	M("genesis::utils").def("resolve_color_string", (class genesis::utils::Color (*)(const std::string &)) &genesis::utils::resolve_color_string, "Resolve a string representing a color.\n\n The string can either be a hex color as accepted by color_from_hex(), e.g., \"#003366[ff]\",\n or one of the named colors, see is_color_name() and color_from_name().\n\nC++: genesis::utils::resolve_color_string(const std::string &) --> class genesis::utils::Color", pybind11::arg("color_str"));
 
 }

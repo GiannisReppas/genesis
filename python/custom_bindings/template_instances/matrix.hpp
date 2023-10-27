@@ -3,7 +3,7 @@
 
 #include "genesis/utils/containers/matrix.hpp"
 #include "genesis/utils/containers/matrix/row.hpp"
-#include "genesis/utils/tools/color.hpp"
+#include "genesis/utils/color/color.hpp"
 #include <pybind11/pybind11.h>
 
 void template_matrix_uint32_t( ::genesis::utils::Matrix< uint32_t > ) {}

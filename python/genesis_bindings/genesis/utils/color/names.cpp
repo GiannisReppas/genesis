@@ -1,7 +1,7 @@
-#include <genesis/utils/tools/color.hpp>
-#include <genesis/utils/tools/color/map.hpp>
-#include <genesis/utils/tools/color/names.hpp>
-#include <genesis/utils/tools/color/normalization.hpp>
+#include <genesis/utils/color/color.hpp>
+#include <genesis/utils/color/map.hpp>
+#include <genesis/utils/color/names.hpp>
+#include <genesis/utils/color/normalization.hpp>
 #include <iterator>
 #include <memory>
 #include <sstream> // __str__
@@ -13,7 +13,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -27,6 +27,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -37,7 +38,7 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-// genesis::utils::ColorNormalization file:genesis/utils/tools/color/normalization.hpp line:52
+// genesis::utils::ColorNormalization file:genesis/utils/color/normalization.hpp line:52
 struct PyCallBack_genesis_utils_ColorNormalization : public genesis::utils::ColorNormalization {
 	using genesis::utils::ColorNormalization::ColorNormalization;
 
@@ -69,33 +70,33 @@ struct PyCallBack_genesis_utils_ColorNormalization : public genesis::utils::Colo
 	}
 };
 
-void bind_genesis_utils_tools_color_names(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_color_names(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	// genesis::utils::is_color_name(const std::string &) file:genesis/utils/tools/color/names.hpp line:51
+	// genesis::utils::is_color_name(const std::string &) file:genesis/utils/color/names.hpp line:51
 	M("genesis::utils").def("is_color_name", (bool (*)(const std::string &)) &genesis::utils::is_color_name, "Return `true` if the name represents one of the named colors offered by genesis,\n which is (currently) a shortcut for is_web_color_name() and is_xkcd_color_name().\n\nC++: genesis::utils::is_color_name(const std::string &) --> bool", pybind11::arg("name"));
 
-	// genesis::utils::color_from_name(const std::string &) file:genesis/utils/tools/color/names.hpp line:57
+	// genesis::utils::color_from_name(const std::string &) file:genesis/utils/color/names.hpp line:57
 	M("genesis::utils").def("color_from_name", (class genesis::utils::Color (*)(const std::string &)) &genesis::utils::color_from_name, "Return the color represented by the given name,\n which is (currently) a shortcut for color_from_name_web() and color_from_name_xkcd().\n\nC++: genesis::utils::color_from_name(const std::string &) --> class genesis::utils::Color", pybind11::arg("name"));
 
-	// genesis::utils::color_palette_web() file:genesis/utils/tools/color/names.hpp line:63
+	// genesis::utils::color_palette_web() file:genesis/utils/color/names.hpp line:63
 	M("genesis::utils").def("color_palette_web", (class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > (*)()) &genesis::utils::color_palette_web, "C++: genesis::utils::color_palette_web() --> class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> >");
 
-	// genesis::utils::is_web_color_name(const std::string &) file:genesis/utils/tools/color/names.hpp line:70
+	// genesis::utils::is_web_color_name(const std::string &) file:genesis/utils/color/names.hpp line:70
 	M("genesis::utils").def("is_web_color_name", (bool (*)(const std::string &)) &genesis::utils::is_web_color_name, "Return true iff the given name is a named web color.\n\n Names are compared only by their alnum chars, and the letter case is ignored.\n\nC++: genesis::utils::is_web_color_name(const std::string &) --> bool", pybind11::arg("name"));
 
-	// genesis::utils::color_from_name_web(const std::string &) file:genesis/utils/tools/color/names.hpp line:78
+	// genesis::utils::color_from_name_web(const std::string &) file:genesis/utils/color/names.hpp line:78
 	M("genesis::utils").def("color_from_name_web", (class genesis::utils::Color (*)(const std::string &)) &genesis::utils::color_from_name_web, "Retrieve a named web color by name.\n\n Names are compared only by their alnum chars, and the letter case is ignored.\n If the color name does not exist, an `std::invalid_argument` exception is thrown.\n\nC++: genesis::utils::color_from_name_web(const std::string &) --> class genesis::utils::Color", pybind11::arg("name"));
 
-	// genesis::utils::color_palette_xkcd() file:genesis/utils/tools/color/names.hpp line:84
+	// genesis::utils::color_palette_xkcd() file:genesis/utils/color/names.hpp line:84
 	M("genesis::utils").def("color_palette_xkcd", (class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > (*)()) &genesis::utils::color_palette_xkcd, "C++: genesis::utils::color_palette_xkcd() --> class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> >");
 
-	// genesis::utils::is_xkcd_color_name(const std::string &) file:genesis/utils/tools/color/names.hpp line:92
+	// genesis::utils::is_xkcd_color_name(const std::string &) file:genesis/utils/color/names.hpp line:92
 	M("genesis::utils").def("is_xkcd_color_name", (bool (*)(const std::string &)) &genesis::utils::is_xkcd_color_name, "Return true iff the given name is a named xkcd color.\n\n Names are compared only by their alnum chars, and the letter case is ignored.\n See color_from_name_xkcd() for details on this color list.\n\nC++: genesis::utils::is_xkcd_color_name(const std::string &) --> bool", pybind11::arg("name"));
 
-	// genesis::utils::color_from_name_xkcd(const std::string &) file:genesis/utils/tools/color/names.hpp line:106
+	// genesis::utils::color_from_name_xkcd(const std::string &) file:genesis/utils/color/names.hpp line:106
 	M("genesis::utils").def("color_from_name_xkcd", (class genesis::utils::Color (*)(const std::string &)) &genesis::utils::color_from_name_xkcd, "Retrieve a named xkcd color by name.\n\n Names are compared only by their alnum chars, and the letter case is ignored.\n If the color name does not exist, an `std::invalid_argument` exception is thrown.\n\n The colors are taken from an [https://xkcd.com/](xkcd) color survey.\n They were published under Public Domain, http://creativecommons.org/publicdomain/zero/1.0/.\n See https://xkcd.com/color/rgb/ and https://blog.xkcd.com/2010/05/03/color-survey-results/\n for details. See also our\n \n\n\n\nC++: genesis::utils::color_from_name_xkcd(const std::string &) --> class genesis::utils::Color", pybind11::arg("name"));
 
-	{ // genesis::utils::ColorMap file:genesis/utils/tools/color/map.hpp line:61
+	{ // genesis::utils::ColorMap file:genesis/utils/color/map.hpp line:61
 		pybind11::class_<genesis::utils::ColorMap, std::shared_ptr<genesis::utils::ColorMap>> cl(M("genesis::utils"), "ColorMap", "Store a list of colors and offer them as a map for values in range `[ 0.0, 1.0 ]`.\n\n The class is an abstraction of color lists, making them easier to use for ranges, gradients, etc.\n When invoked, it interpolates between entries of the list according to the provided value.\n It is best used in combination with a ColorNormalization, so that arbitrary ranges can be\n mapped into the allowed interval `[ 0.0, 1.0 ]`.");
 		cl.def( pybind11::init( [](){ return new genesis::utils::ColorMap(); } ) );
 		cl.def( pybind11::init<const class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > &>(), pybind11::arg("colors") );
@@ -127,7 +128,7 @@ void bind_genesis_utils_tools_color_names(std::function< pybind11::module &(std:
 		cl.def("__call__", (class genesis::utils::Color (genesis::utils::ColorMap::*)(const class genesis::utils::ColorNormalization &, double) const) &genesis::utils::ColorMap::operator(), "Return a Color for the given  normalized by \n     \n\nC++: genesis::utils::ColorMap::operator()(const class genesis::utils::ColorNormalization &, double) const --> class genesis::utils::Color", pybind11::arg("norm"), pybind11::arg("value"));
 		cl.def("__call__", (class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > (genesis::utils::ColorMap::*)(const class genesis::utils::ColorNormalization &, const class std::vector<double, class std::allocator<double> > &) const) &genesis::utils::ColorMap::operator(), "Return the mapped colors for a vector of  normalized by \n     \n\nC++: genesis::utils::ColorMap::operator()(const class genesis::utils::ColorNormalization &, const class std::vector<double, class std::allocator<double> > &) const --> class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> >", pybind11::arg("norm"), pybind11::arg("values"));
 	}
-	{ // genesis::utils::ColorNormalization file:genesis/utils/tools/color/normalization.hpp line:52
+	{ // genesis::utils::ColorNormalization file:genesis/utils/color/normalization.hpp line:52
 		pybind11::class_<genesis::utils::ColorNormalization, std::shared_ptr<genesis::utils::ColorNormalization>, PyCallBack_genesis_utils_ColorNormalization> cl(M("genesis::utils"), "ColorNormalization", "Base class for color normalization.");
 		cl.def( pybind11::init( [](){ return new PyCallBack_genesis_utils_ColorNormalization(); } ) );
 		cl.def(pybind11::init<PyCallBack_genesis_utils_ColorNormalization const &>());

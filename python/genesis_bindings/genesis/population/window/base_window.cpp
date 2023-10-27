@@ -18,7 +18,7 @@
 #include <string>
 #include <pybind11/functional.h>
 #include <../python/custom_bindings/extensions/matrix.hpp>
-#include <genesis/utils/tools/color/functions.hpp>
+#include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/bitvector.hpp>
 #include <../python/custom_bindings/extensions/range.hpp>
 #include <../python/custom_bindings/extensions/quality.hpp>
@@ -32,6 +32,7 @@
 #include <../python/custom_bindings/extensions/tree.hpp>
 #include <../python/custom_bindings/extensions/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
+#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -58,40 +59,6 @@ struct PyCallBack_genesis_population_BaseWindow_genesis_population_Variant_t : p
 			else return pybind11::detail::cast_safe<void>(std::move(o));
 		}
 		return BaseWindow::clear_();
-	}
-};
-
-// genesis::population::BaseWindowIterator file:genesis/population/window/base_window_iterator.hpp line:111
-struct PyCallBack_genesis_population_BaseWindowIterator_genesis_utils_LambdaIterator_genesis_population_Variant_genesis_population_VariantInputIteratorData_Iterator_genesis_population_Variant_genesis_population_WindowView_genesis_population_Variant_t : public genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>> {
-	using genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>::BaseWindowIterator;
-
-	using _binder_ret_0 = class std::unique_ptr<class genesis::population::BaseWindowIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant, class genesis::population::WindowView<struct genesis::population::Variant> >::BaseIterator, struct std::default_delete<class genesis::population::BaseWindowIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant, class genesis::population::WindowView<struct genesis::population::Variant> >::BaseIterator> >;
-	_binder_ret_0 get_begin_iterator_() override {
-		pybind11::gil_scoped_acquire gil;
-		pybind11::function overload = pybind11::get_overload(static_cast<const genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>> *>(this), "get_begin_iterator_");
-		if (overload) {
-			auto o = overload.operator()<pybind11::return_value_policy::reference>();
-			if (pybind11::detail::cast_is_temporary_value_reference<_binder_ret_0>::value) {
-				static pybind11::detail::override_caster_t<_binder_ret_0> caster;
-				return pybind11::detail::cast_ref<_binder_ret_0>(std::move(o), caster);
-			}
-			else return pybind11::detail::cast_safe<_binder_ret_0>(std::move(o));
-		}
-		pybind11::pybind11_fail("Tried to call pure virtual function \"BaseWindowIterator::get_begin_iterator_\"");
-	}
-	using _binder_ret_1 = class std::unique_ptr<class genesis::population::BaseWindowIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant, class genesis::population::WindowView<struct genesis::population::Variant> >::BaseIterator, struct std::default_delete<class genesis::population::BaseWindowIterator<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, struct genesis::population::Variant, class genesis::population::WindowView<struct genesis::population::Variant> >::BaseIterator> >;
-	_binder_ret_1 get_end_iterator_() override {
-		pybind11::gil_scoped_acquire gil;
-		pybind11::function overload = pybind11::get_overload(static_cast<const genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>> *>(this), "get_end_iterator_");
-		if (overload) {
-			auto o = overload.operator()<pybind11::return_value_policy::reference>();
-			if (pybind11::detail::cast_is_temporary_value_reference<_binder_ret_1>::value) {
-				static pybind11::detail::override_caster_t<_binder_ret_1> caster;
-				return pybind11::detail::cast_ref<_binder_ret_1>(std::move(o), caster);
-			}
-			else return pybind11::detail::cast_safe<_binder_ret_1>(std::move(o));
-		}
-		pybind11::pybind11_fail("Tried to call pure virtual function \"BaseWindowIterator::get_end_iterator_\"");
 	}
 };
 
@@ -148,10 +115,7 @@ void bind_genesis_population_window_base_window(std::function< pybind11::module 
 ;
 
 	{ // genesis::population::BaseWindowIterator file:genesis/population/window/base_window_iterator.hpp line:111
-		pybind11::class_<genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>, std::shared_ptr<genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>>, PyCallBack_genesis_population_BaseWindowIterator_genesis_utils_LambdaIterator_genesis_population_Variant_genesis_population_VariantInputIteratorData_Iterator_genesis_population_Variant_genesis_population_WindowView_genesis_population_Variant_t> cl(M("genesis::population"), "BaseWindowIterator_genesis_utils_LambdaIterator_genesis_population_Variant_genesis_population_VariantInputIteratorData_Iterator_genesis_population_Variant_genesis_population_WindowView_genesis_population_Variant_t", "");
-		cl.def( pybind11::init<class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator, class genesis::utils::LambdaIterator<struct genesis::population::Variant, struct genesis::population::VariantInputIteratorData>::Iterator>(), pybind11::arg("begin"), pybind11::arg("end") );
-
-		cl.def(pybind11::init<PyCallBack_genesis_population_BaseWindowIterator_genesis_utils_LambdaIterator_genesis_population_Variant_genesis_population_VariantInputIteratorData_Iterator_genesis_population_Variant_genesis_population_WindowView_genesis_population_Variant_t const &>());
+		pybind11::class_<genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>, std::shared_ptr<genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>>> cl(M("genesis::population"), "BaseWindowIterator_genesis_utils_LambdaIterator_genesis_population_Variant_genesis_population_VariantInputIteratorData_Iterator_genesis_population_Variant_genesis_population_WindowView_genesis_population_Variant_t", "");
 		cl.def_readwrite("entry_input_function", &genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>::entry_input_function);
 		cl.def_readwrite("chromosome_function", &genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>::chromosome_function);
 		cl.def_readwrite("position_function", &genesis::population::BaseWindowIterator<genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator,genesis::population::Variant,genesis::population::WindowView<genesis::population::Variant>>::position_function);
