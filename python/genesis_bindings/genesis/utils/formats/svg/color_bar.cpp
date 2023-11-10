@@ -13,6 +13,7 @@
 #include <genesis/utils/formats/svg/matrix.hpp>
 #include <genesis/utils/formats/svg/object.hpp>
 #include <genesis/utils/formats/svg/shapes.hpp>
+#include <genesis/utils/io/base_output_target.hpp>
 #include <ios>
 #include <iterator>
 #include <map>
@@ -57,6 +58,24 @@
 
 void bind_genesis_utils_formats_svg_color_bar(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	{ // genesis::utils::SvgColorBarSettings file:genesis/utils/formats/svg/color_bar.hpp line:59
+		pybind11::class_<genesis::utils::SvgColorBarSettings, std::shared_ptr<genesis::utils::SvgColorBarSettings>> cl(M("genesis::utils"), "SvgColorBarSettings", "");
+		cl.def( pybind11::init( [](){ return new genesis::utils::SvgColorBarSettings(); } ) );
+
+		pybind11::enum_<genesis::utils::SvgColorBarSettings::Direction>(cl, "Direction", "")
+			.value("kTopToBottom", genesis::utils::SvgColorBarSettings::Direction::kTopToBottom)
+			.value("kBottomToTop", genesis::utils::SvgColorBarSettings::Direction::kBottomToTop)
+			.value("kLeftToRight", genesis::utils::SvgColorBarSettings::Direction::kLeftToRight)
+			.value("kRightToLeft", genesis::utils::SvgColorBarSettings::Direction::kRightToLeft);
+
+		cl.def_readwrite("direction", &genesis::utils::SvgColorBarSettings::direction);
+		cl.def_readwrite("width", &genesis::utils::SvgColorBarSettings::width);
+		cl.def_readwrite("height", &genesis::utils::SvgColorBarSettings::height);
+		cl.def_readwrite("with_tickmarks", &genesis::utils::SvgColorBarSettings::with_tickmarks);
+		cl.def_readwrite("with_labels", &genesis::utils::SvgColorBarSettings::with_labels);
+		cl.def_readwrite("num_ticks", &genesis::utils::SvgColorBarSettings::num_ticks);
+		cl.def_readwrite("text_size", &genesis::utils::SvgColorBarSettings::text_size);
+	}
 	// genesis::utils::make_svg_color_bar(const struct genesis::utils::SvgColorBarSettings &, const class genesis::utils::ColorMap &, const class genesis::utils::ColorNormalization &, const std::string &) file:genesis/utils/formats/svg/color_bar.hpp line:92
 	M("genesis::utils").def("make_svg_color_bar", [](const struct genesis::utils::SvgColorBarSettings & a0, const class genesis::utils::ColorMap & a1, const class genesis::utils::ColorNormalization & a2) -> std::pair<struct genesis::utils::SvgGradientLinear, struct genesis::utils::SvgGroup> { return genesis::utils::make_svg_color_bar(a0, a1, a2); }, "", pybind11::arg("settings"), pybind11::arg("map"), pybind11::arg("norm"));
 	M("genesis::utils").def("make_svg_color_bar", (struct std::pair<struct genesis::utils::SvgGradientLinear, struct genesis::utils::SvgGroup> (*)(const struct genesis::utils::SvgColorBarSettings &, const class genesis::utils::ColorMap &, const class genesis::utils::ColorNormalization &, const std::string &)) &genesis::utils::make_svg_color_bar, "C++: genesis::utils::make_svg_color_bar(const struct genesis::utils::SvgColorBarSettings &, const class genesis::utils::ColorMap &, const class genesis::utils::ColorNormalization &, const std::string &) --> struct std::pair<struct genesis::utils::SvgGradientLinear, struct genesis::utils::SvgGroup>", pybind11::arg("settings"), pybind11::arg("map"), pybind11::arg("norm"), pybind11::arg("id"));
@@ -67,7 +86,7 @@ void bind_genesis_utils_formats_svg_color_bar(std::function< pybind11::module &(
 	// genesis::utils::make_svg_color_list(const class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > &, const class std::vector<std::string, class std::allocator<std::string > > &) file:genesis/utils/formats/svg/color_bar.hpp line:104
 	M("genesis::utils").def("make_svg_color_list", (struct genesis::utils::SvgGroup (*)(const class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > &, const class std::vector<std::string, class std::allocator<std::string > > &)) &genesis::utils::make_svg_color_list, "C++: genesis::utils::make_svg_color_list(const class std::vector<class genesis::utils::Color, class std::allocator<class genesis::utils::Color> > &, const class std::vector<std::string, class std::allocator<std::string > > &) --> struct genesis::utils::SvgGroup", pybind11::arg("colors"), pybind11::arg("labels"));
 
-	{ // genesis::utils::SvgDocument file:genesis/utils/formats/svg/document.hpp line:49
+	{ // genesis::utils::SvgDocument file:genesis/utils/formats/svg/document.hpp line:50
 		pybind11::class_<genesis::utils::SvgDocument, std::shared_ptr<genesis::utils::SvgDocument>> cl(M("genesis::utils"), "SvgDocument", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::SvgDocument(); } ) );
 		cl.def( pybind11::init( [](genesis::utils::SvgDocument const &o){ return new genesis::utils::SvgDocument(o); } ) );
@@ -87,6 +106,7 @@ void bind_genesis_utils_formats_svg_color_bar(std::function< pybind11::module &(
 		cl.def("assign", (class genesis::utils::SvgDocument & (genesis::utils::SvgDocument::*)(const class genesis::utils::SvgDocument &)) &genesis::utils::SvgDocument::operator=, "C++: genesis::utils::SvgDocument::operator=(const class genesis::utils::SvgDocument &) --> class genesis::utils::SvgDocument &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 		cl.def("bounding_box", (struct genesis::utils::SvgBox (genesis::utils::SvgDocument::*)() const) &genesis::utils::SvgDocument::bounding_box, "C++: genesis::utils::SvgDocument::bounding_box() const --> struct genesis::utils::SvgBox");
 		cl.def("write", (void (genesis::utils::SvgDocument::*)(std::ostream &) const) &genesis::utils::SvgDocument::write, "C++: genesis::utils::SvgDocument::write(std::ostream &) const --> void", pybind11::arg("out"));
+		cl.def("write", (void (genesis::utils::SvgDocument::*)(class std::shared_ptr<class genesis::utils::BaseOutputTarget>) const) &genesis::utils::SvgDocument::write, "C++: genesis::utils::SvgDocument::write(class std::shared_ptr<class genesis::utils::BaseOutputTarget>) const --> void", pybind11::arg("target"));
 		cl.def("add", (class genesis::utils::SvgDocument & (genesis::utils::SvgDocument::*)(const class genesis::utils::SvgObject &)) &genesis::utils::SvgDocument::add, "Add an SvgObject to the document.\n\n Returns the SvgDocument in order to allow for a fluent interface.\n\nC++: genesis::utils::SvgDocument::add(const class genesis::utils::SvgObject &) --> class genesis::utils::SvgDocument &", pybind11::return_value_policy::reference_internal, pybind11::arg("object"));
 		cl.def("__lshift__", (class genesis::utils::SvgDocument & (genesis::utils::SvgDocument::*)(const class genesis::utils::SvgObject &)) &genesis::utils::SvgDocument::operator<<, "Shortcut operator for add(), which allows an even more fluent interface.\n\nC++: genesis::utils::SvgDocument::operator<<(const class genesis::utils::SvgObject &) --> class genesis::utils::SvgDocument &", pybind11::return_value_policy::reference_internal, pybind11::arg("object"));
 	}

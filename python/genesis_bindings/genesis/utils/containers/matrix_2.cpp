@@ -1,18 +1,12 @@
 #include <functional>
-#include <genesis/utils/containers/matrix/operators.hpp>
-#include <genesis/utils/core/std.hpp>
-#include <genesis/utils/io/gzip_block_ostream.hpp>
-#include <genesis/utils/io/gzip_stream.hpp>
+#include <genesis/utils/containers/matrix.hpp>
+#include <genesis/utils/containers/matrix/row.hpp>
 #include <genesis/utils/tools/char_lookup.hpp>
-#include <ios>
 #include <iterator>
-#include <locale>
 #include <memory>
-#include <ostream>
 #include <sstream> // __str__
-#include <streambuf>
 #include <string>
-#include <utility>
+#include <vector>
 
 #include <functional>
 #include <pybind11/pybind11.h>
@@ -44,17 +38,28 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_containers_matrix_operators(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_containers_matrix_2(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	// genesis::utils::triangular_indices(unsigned long, unsigned long) file:genesis/utils/containers/matrix/operators.hpp line:82
-	M("genesis::utils").def("triangular_indices", (struct std::pair<unsigned long, unsigned long> (*)(unsigned long, unsigned long)) &genesis::utils::triangular_indices, "Given a linear index in a upper triangular Matrix, find the corresponding Matrix indices.\n\n Given an upper triangle Matrix of size `n == 5`\n\n     0  k0  k1  k2  k3\n     0   0  k4  k5  k6\n     0   0   0  k7  k8\n     0   0   0   0  k9\n     0   0   0   0   0\n\n and given a  (like above), find the corresponding indices `i` and `j` for this \n e.g.,\n\n     k == 0 --> i == 0, j == 1\n     k == 5 --> i == 1, j == 3\n     k == 9 --> i == 3, j == 4\n     ...\n\n Because the calculation involves solving\n [triangular numbers](https://en.wikipedia.org/wiki/Triangular_number), the function internally\n operates on `double` values. This is a bit smelly, but seems to work (tested with `n == 100,000`).\n\n See also triangular_index() for the opposite function, and triangular_size() to calculate the\n maximal  that will occur in a trian Matrix of a given size \n\n \n Linear index in the upper triangle of a quadratic Matrix.\n \n\n Size of the quadratic Matrix, i.e., the row/column length.\n \n\n  Pair `( i, j )` of the indices for the given `k`.\n\nC++: genesis::utils::triangular_indices(unsigned long, unsigned long) --> struct std::pair<unsigned long, unsigned long>", pybind11::arg("k"), pybind11::arg("n"));
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<class pybind11::object> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<class pybind11::object> &)) &genesis::utils::transpose_inplace<pybind11::object>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<class pybind11::object> &) --> void", pybind11::arg(""));
 
-	// genesis::utils::triangular_index(unsigned long, unsigned long, unsigned long) file:genesis/utils/containers/matrix/operators.hpp line:95
-	M("genesis::utils").def("triangular_index", (unsigned long (*)(unsigned long, unsigned long, unsigned long)) &genesis::utils::triangular_index, "Given indices  and  in a quadratic Matrix, find the corresponding linear index.\n\n See triangular_indices() for the opposite function, which also explains the details, and\n triangular_size() to calculate the\n maximal  that will occur in a trian Matrix of a given size \n\n \n j Indices of the Matrix for which to calculate the linear index `k`.\n \n\n    Size of the quadratic Matrix, i.e., the row/column length.\n \n\n     Linear index `k` for the given  and \n \n\nC++: genesis::utils::triangular_index(unsigned long, unsigned long, unsigned long) --> unsigned long", pybind11::arg("i"), pybind11::arg("j"), pybind11::arg("n"));
+	{ // genesis::utils::MatrixRow file:genesis/utils/containers/matrix/row.hpp line:60
+		pybind11::class_<genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>, std::shared_ptr<genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>>> cl(M("genesis::utils"), "MatrixRow_genesis_utils_Matrix_unsigned_int_unsigned_int_t", "");
+		cl.def( pybind11::init<class genesis::utils::Matrix<unsigned int> &, unsigned long>(), pybind11::arg("mat"), pybind11::arg("row") );
 
-	// genesis::utils::triangular_size(unsigned long) file:genesis/utils/containers/matrix/operators.hpp line:116
-	M("genesis::utils").def("triangular_size", (unsigned long (*)(unsigned long)) &genesis::utils::triangular_size, "Calculate the number of linear indices needed for a triangular Matrix of size \n\n Given an upper triangle Matrix of size `n == 5`\n\n     0  k0  k1  k2  k3\n     0   0  k4  k5  k6\n     0   0   0  k7  k8\n     0   0   0   0  k9\n     0   0   0   0   0\n\n we need `10` indices `k == 0..9` to linearly describe the positions in the triangle.\n This function returns this number of indices for a given \n\n See also triangular_indices() for calculating the Matrix indices `i` and `j` for a given `k`.\n\n \n Size of the quadratic Matrix, i.e., the row/column length.\n \n\n  Number of needed linear indices `k` to describe a triangle of the Matrix.\n\nC++: genesis::utils::triangular_size(unsigned long) --> unsigned long", pybind11::arg("n"));
-
+		cl.def( pybind11::init( [](genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int> const &o){ return new genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>(o); } ) );
+		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
+		cl.def("at", (unsigned int & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(unsigned long) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::at, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::at(unsigned long) const --> unsigned int &", pybind11::return_value_policy::reference_internal, pybind11::arg("column"));
+		cl.def("__getitem__", (unsigned int & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(unsigned long) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator[], "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator[](unsigned long) const --> unsigned int &", pybind11::return_value_policy::reference_internal, pybind11::arg("column"));
+		cl.def("matrix", (class genesis::utils::Matrix<unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::matrix, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::matrix() const --> class genesis::utils::Matrix<unsigned int> &", pybind11::return_value_policy::reference_internal);
+		cl.def("row", (unsigned long (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::row, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::row() const --> unsigned long");
+		cl.def("size", (unsigned long (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::size, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::size() const --> unsigned long");
+		cl.def("to_vector", (class std::vector<unsigned int, class std::allocator<unsigned int> > (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::to_vector, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::to_vector() const --> class std::vector<unsigned int, class std::allocator<unsigned int> >");
+		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class std::vector<unsigned int, class std::allocator<unsigned int> > &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=(const class std::vector<unsigned int, class std::allocator<unsigned int> > &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg("vec"));
+		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::assign, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::assign(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg("other"));
+		cl.def("__eq__", (bool (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator==, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator==(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const --> bool", pybind11::arg("other"));
+		cl.def("__ne__", (bool (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator!=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator!=(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const --> bool", pybind11::arg("other"));
+	}
 	{ // genesis::utils::CharLookup file:genesis/utils/tools/char_lookup.hpp line:54
 		pybind11::class_<genesis::utils::CharLookup<unsigned char>, std::shared_ptr<genesis::utils::CharLookup<unsigned char>>> cl(M("genesis::utils"), "CharLookup_unsigned_char_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::CharLookup<unsigned char>(); } ) );
@@ -112,7 +117,4 @@ void bind_genesis_utils_containers_matrix_operators(std::function< pybind11::mod
 		cl.def("get_chars_equal_to", (std::string (genesis::utils::CharLookup<unsigned long>::*)(unsigned long) const) &genesis::utils::CharLookup<unsigned long>::get_chars_equal_to, "C++: genesis::utils::CharLookup<unsigned long>::get_chars_equal_to(unsigned long) const --> std::string", pybind11::arg("comp_value"));
 		cl.def("all_equal_to", (bool (genesis::utils::CharLookup<unsigned long>::*)(unsigned long) const) &genesis::utils::CharLookup<unsigned long>::all_equal_to, "C++: genesis::utils::CharLookup<unsigned long>::all_equal_to(unsigned long) const --> bool", pybind11::arg("comp_value"));
 	}
-	// genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) file:genesis/utils/core/std.hpp line:82
-	M("genesis::utils").def("make_unique", (class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> > (*)(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &)) &genesis::utils::make_unique<genesis::utils::GzipBlockOStream,std::ostream &, unsigned long &, genesis::utils::GzipCompressionLevel &, unsigned long &>, "C++: genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) --> class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> >", pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"));
-
 }

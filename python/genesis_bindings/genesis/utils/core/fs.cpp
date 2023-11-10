@@ -1,9 +1,7 @@
 #include <functional>
 #include <genesis/utils/core/fs.hpp>
-#include <genesis/utils/io/base_input_source.hpp>
 #include <iterator>
 #include <memory>
-#include <sstream> // __str__
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -41,6 +39,13 @@
 
 void bind_genesis_utils_core_fs(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	// genesis::utils::file_is_readable(const std::string &, std::string &) file:genesis/utils/core/fs.hpp line:83
+	M("genesis::utils").def("file_is_readable", (bool (*)(const std::string &, std::string &)) &genesis::utils::file_is_readable, "Return whether a file is readable, and potentially store the error message.\n\n For this, the file has to exist, and be accessible.\n Another potential error is that too many files are opened already.\n\nC++: genesis::utils::file_is_readable(const std::string &, std::string &) --> bool", pybind11::arg("filename"), pybind11::arg("err_str"));
+
+	// genesis::utils::file_read(const std::string &, bool) file:genesis/utils/core/fs.hpp line:93
+	M("genesis::utils").def("file_read", [](const std::string & a0) -> std::string { return genesis::utils::file_read(a0); }, "", pybind11::arg("filename"));
+	M("genesis::utils").def("file_read", (std::string (*)(const std::string &, bool)) &genesis::utils::file_read, "Return the contents of a file as a string.\n\n If the parameter  is `true` (default), it is first determined whether the\n file is gzip compressed, and if so, the file is decompressed when reading.\n\n If the file is not readable, the function throws `std::runtime_error`.\n\nC++: genesis::utils::file_read(const std::string &, bool) --> std::string", pybind11::arg("filename"), pybind11::arg("detect_compression"));
+
 	// genesis::utils::file_read_lines(const std::string &, bool) file:genesis/utils/core/fs.hpp line:106
 	M("genesis::utils").def("file_read_lines", [](const std::string & a0) -> std::vector<std::string, class std::allocator<std::string > > { return genesis::utils::file_read_lines(a0); }, "", pybind11::arg("filename"));
 	M("genesis::utils").def("file_read_lines", (class std::vector<std::string, class std::allocator<std::string > > (*)(const std::string &, bool)) &genesis::utils::file_read_lines, "Return the contents of a file as a vector of strings, one entry for each line.\n\n If the parameter  is `true` (default), it is first determined whether the\n file is gzip compressed, and if so, the file is decompressed when reading.\n\n If the file is not readable, the function throws `std::runtime_error`.\n\nC++: genesis::utils::file_read_lines(const std::string &, bool) --> class std::vector<std::string, class std::allocator<std::string > >", pybind11::arg("filename"), pybind11::arg("detect_compression"));
@@ -115,11 +120,4 @@ void bind_genesis_utils_core_fs(std::function< pybind11::module &(std::string co
 	// genesis::utils::sanitize_filename(const std::string &) file:genesis/utils/core/fs.hpp line:340
 	M("genesis::utils").def("sanitize_filename", (std::string (*)(const std::string &)) &genesis::utils::sanitize_filename, "Remove or replace all invalid parts of a filename.\n\n Similar to is_valid_filename(), this function is not meant to be an ultimate solution to valid\n filenames. See there for details.\n\n The function is meant to be called on the file name itself, without the directory path leading\n to it. File extensions are allowed. Thus, you might need to call file_basename() before in order\n to get the file name without the path.\n\n This function does the following:\n\n   * All non-printable characters are removed.\n   * Spaces at the beginning and end are removed.\n   * All invalid chars are replaced by an underscore. See is_valid_filename() for a list of those\n     chars.\n\n If after this procedure the filename is empty, an exception is thrown. This is meant to save the\n user from checking this, or from running into trouble when trying to write to this \"file\" -\n because an empty filename will point to a directory name.\n\nC++: genesis::utils::sanitize_filename(const std::string &) --> std::string", pybind11::arg("filename"));
 
-	{ // genesis::utils::BaseInputSource file:genesis/utils/io/base_input_source.hpp line:50
-		pybind11::class_<genesis::utils::BaseInputSource, std::shared_ptr<genesis::utils::BaseInputSource>> cl(M("genesis::utils"), "BaseInputSource", "Abstract base class for reading byte data from input sources.\n\n It offers to read() a certain amount of bytes into a char buffer.");
-		cl.def("assign", (class genesis::utils::BaseInputSource & (genesis::utils::BaseInputSource::*)(const class genesis::utils::BaseInputSource &)) &genesis::utils::BaseInputSource::operator=, "C++: genesis::utils::BaseInputSource::operator=(const class genesis::utils::BaseInputSource &) --> class genesis::utils::BaseInputSource &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
-		cl.def("read", (unsigned long (genesis::utils::BaseInputSource::*)(char *, unsigned long)) &genesis::utils::BaseInputSource::read, "Read  many bytes into the char \n\n Returns the number of bytes that have actually been read, which might be lower than\n the initial target  e.g., if the end of the input source was reached.\n\nC++: genesis::utils::BaseInputSource::read(char *, unsigned long) --> unsigned long", pybind11::arg("buffer"), pybind11::arg("size"));
-		cl.def("source_name", (std::string (genesis::utils::BaseInputSource::*)() const) &genesis::utils::BaseInputSource::source_name, "Get a name of the input source. This is intended for user output.\n\nC++: genesis::utils::BaseInputSource::source_name() const --> std::string");
-		cl.def("source_string", (std::string (genesis::utils::BaseInputSource::*)() const) &genesis::utils::BaseInputSource::source_string, "Get a string representing the input source. This is intended for the reader classes,\n which for example might want to examine the input file name.\n\nC++: genesis::utils::BaseInputSource::source_string() const --> std::string");
-	}
 }

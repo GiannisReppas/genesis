@@ -22,6 +22,7 @@
 #include <genesis/utils/formats/svg/helper.hpp>
 #include <genesis/utils/formats/svg/object.hpp>
 #include <genesis/utils/formats/svg/text.hpp>
+#include <genesis/utils/io/base_output_target.hpp>
 #include <ios>
 #include <iterator>
 #include <memory>

@@ -1,8 +1,13 @@
 #include <genesis/utils/core/fs.hpp>
 #include <genesis/utils/core/logging.hpp>
+#include <genesis/utils/core/std.hpp>
+#include <genesis/utils/io/gzip_block_ostream.hpp>
+#include <genesis/utils/io/gzip_stream.hpp>
 #include <ios>
 #include <iterator>
+#include <locale>
 #include <memory>
+#include <mutex>
 #include <ostream>
 #include <sstream>
 #include <sstream> // __str__
@@ -39,8 +44,14 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_core_logging(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_core_std(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	// genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) file:genesis/utils/core/std.hpp line:82
+	M("genesis::utils").def("make_unique", (class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> > (*)(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &)) &genesis::utils::make_unique<genesis::utils::GzipBlockOStream,std::ostream &, unsigned long &, genesis::utils::GzipCompressionLevel &, unsigned long &>, "C++: genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) --> class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> >", pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"));
+
+	// genesis::utils::make_unique() file:genesis/utils/core/std.hpp line:82
+	M("genesis::utils").def("make_unique", (class std::unique_ptr<class std::mutex, struct std::default_delete<class std::mutex> > (*)()) &genesis::utils::make_unique<std::mutex>, "C++: genesis::utils::make_unique() --> class std::unique_ptr<class std::mutex, struct std::default_delete<class std::mutex> >");
+
 	// genesis::utils::logging_progress_value(long) file:genesis/utils/core/logging.hpp line:179
 	M("genesis::utils").def("logging_progress_value", []() -> long { return genesis::utils::logging_progress_value(); }, "");
 	M("genesis::utils").def("logging_progress_value", (long (*)(long)) &genesis::utils::logging_progress_value, "Hack function to make sure that the value arugment in #LOG_PROG is only evaluated once.\n\n Without this function, #LOG_PROG would include two appearances of its variable `value`, which\n means that a statement like\n\n     LOG_PROG(++i, n) << \"of progress.\";\n\n would lead to a double evaluation of the increment statement `++i`. That is not intended, thus\n we need this hack function.\n\nC++: genesis::utils::logging_progress_value(long) --> long", pybind11::arg("value"));
@@ -125,12 +136,5 @@ void bind_genesis_utils_core_logging(std::function< pybind11::module &(std::stri
 
 	// genesis::utils::file_is_readable(const std::string &) file:genesis/utils/core/fs.hpp line:75
 	M("genesis::utils").def("file_is_readable", (bool (*)(const std::string &)) &genesis::utils::file_is_readable, "Return whether a file is readable.\n\n For this, the file has to exist, and be accessible.\n Another potential error is that too many files are opened already.\n\n See file_is_readable( std::string const&, std::string& ) for a version of the function that also\n allows to retrieve the error message in cases where the result is `false`.\n\nC++: genesis::utils::file_is_readable(const std::string &) --> bool", pybind11::arg("filename"));
-
-	// genesis::utils::file_is_readable(const std::string &, std::string &) file:genesis/utils/core/fs.hpp line:83
-	M("genesis::utils").def("file_is_readable", (bool (*)(const std::string &, std::string &)) &genesis::utils::file_is_readable, "Return whether a file is readable, and potentially store the error message.\n\n For this, the file has to exist, and be accessible.\n Another potential error is that too many files are opened already.\n\nC++: genesis::utils::file_is_readable(const std::string &, std::string &) --> bool", pybind11::arg("filename"), pybind11::arg("err_str"));
-
-	// genesis::utils::file_read(const std::string &, bool) file:genesis/utils/core/fs.hpp line:93
-	M("genesis::utils").def("file_read", [](const std::string & a0) -> std::string { return genesis::utils::file_read(a0); }, "", pybind11::arg("filename"));
-	M("genesis::utils").def("file_read", (std::string (*)(const std::string &, bool)) &genesis::utils::file_read, "Return the contents of a file as a string.\n\n If the parameter  is `true` (default), it is first determined whether the\n file is gzip compressed, and if so, the file is decompressed when reading.\n\n If the file is not readable, the function throws `std::runtime_error`.\n\nC++: genesis::utils::file_read(const std::string &, bool) --> std::string", pybind11::arg("filename"), pybind11::arg("detect_compression"));
 
 }

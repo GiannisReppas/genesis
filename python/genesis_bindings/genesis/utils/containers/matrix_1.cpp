@@ -1,13 +1,7 @@
 #include <genesis/utils/containers/matrix.hpp>
-#include <genesis/utils/containers/matrix/operators.hpp>
-#include <genesis/utils/containers/matrix/row.hpp>
-#include <ios>
 #include <iterator>
-#include <locale>
 #include <memory>
-#include <ostream>
 #include <sstream> // __str__
-#include <streambuf>
 #include <string>
 #include <vector>
 
@@ -43,7 +37,10 @@
 
 void bind_genesis_utils_containers_matrix_1(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:50
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<int> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<int> &)) &genesis::utils::transpose_inplace<int>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<int> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
 		pybind11::class_<genesis::utils::Matrix<unsigned long>, std::shared_ptr<genesis::utils::Matrix<unsigned long>>> cl(M("genesis::utils"), "Matrix_unsigned_long_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<unsigned long>(); } ) );
 		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
@@ -69,11 +66,43 @@ void bind_genesis_utils_containers_matrix_1(std::function< pybind11::module &(st
 		cl.def("__eq__", (bool (genesis::utils::Matrix<unsigned long>::*)(const class genesis::utils::Matrix<unsigned long> &) const) &genesis::utils::Matrix<unsigned long>::operator==, "C++: genesis::utils::Matrix<unsigned long>::operator==(const class genesis::utils::Matrix<unsigned long> &) const --> bool", pybind11::arg("other"));
 		cl.def("__ne__", (bool (genesis::utils::Matrix<unsigned long>::*)(const class genesis::utils::Matrix<unsigned long> &) const) &genesis::utils::Matrix<unsigned long>::operator!=, "C++: genesis::utils::Matrix<unsigned long>::operator!=(const class genesis::utils::Matrix<unsigned long> &) const --> bool", pybind11::arg("other"));
 
-		cl.def("__str__", [](genesis::utils::Matrix<unsigned long> const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
+		extend_matrix(cl);
+	}
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<unsigned long> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<unsigned long> &)) &genesis::utils::transpose_inplace<unsigned long>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<unsigned long> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
+		pybind11::class_<genesis::utils::Matrix<signed char>, std::shared_ptr<genesis::utils::Matrix<signed char>>> cl(M("genesis::utils"), "Matrix_signed_char_t", "");
+		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<signed char>(); } ) );
+		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
+
+		cl.def( pybind11::init<unsigned long, unsigned long, signed char>(), pybind11::arg("rows"), pybind11::arg("cols"), pybind11::arg("init") );
+
+		cl.def( pybind11::init<unsigned long, unsigned long, const class std::vector<signed char, class std::allocator<signed char> > &>(), pybind11::arg("rows"), pybind11::arg("cols"), pybind11::arg("data") );
+
+		cl.def( pybind11::init( [](genesis::utils::Matrix<signed char> const &o){ return new genesis::utils::Matrix<signed char>(o); } ) );
+		cl.def("assign", (class genesis::utils::Matrix<signed char> & (genesis::utils::Matrix<signed char>::*)(const class genesis::utils::Matrix<signed char> &)) &genesis::utils::Matrix<signed char>::operator=, "C++: genesis::utils::Matrix<signed char>::operator=(const class genesis::utils::Matrix<signed char> &) --> class genesis::utils::Matrix<signed char> &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
+		cl.def("swap", (void (genesis::utils::Matrix<signed char>::*)(class genesis::utils::Matrix<signed char> &)) &genesis::utils::Matrix<signed char>::swap, "C++: genesis::utils::Matrix<signed char>::swap(class genesis::utils::Matrix<signed char> &) --> void", pybind11::arg("other"));
+		cl.def("rows", (unsigned long (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::rows, "C++: genesis::utils::Matrix<signed char>::rows() const --> unsigned long");
+		cl.def("cols", (unsigned long (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::cols, "C++: genesis::utils::Matrix<signed char>::cols() const --> unsigned long");
+		cl.def("size", (unsigned long (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::size, "C++: genesis::utils::Matrix<signed char>::size() const --> unsigned long");
+		cl.def("empty", (bool (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::empty, "C++: genesis::utils::Matrix<signed char>::empty() const --> bool");
+		cl.def("data", (const class std::vector<signed char, class std::allocator<signed char> > & (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::data, "C++: genesis::utils::Matrix<signed char>::data() const --> const class std::vector<signed char, class std::allocator<signed char> > &", pybind11::return_value_policy::reference_internal);
+		cl.def("at", (signed char & (genesis::utils::Matrix<signed char>::*)(const unsigned long, const unsigned long)) &genesis::utils::Matrix<signed char>::at, "C++: genesis::utils::Matrix<signed char>::at(const unsigned long, const unsigned long) --> signed char &", pybind11::return_value_policy::reference_internal, pybind11::arg("row"), pybind11::arg("col"));
+		cl.def("__call__", (signed char & (genesis::utils::Matrix<signed char>::*)(const unsigned long, const unsigned long)) &genesis::utils::Matrix<signed char>::operator(), "C++: genesis::utils::Matrix<signed char>::operator()(const unsigned long, const unsigned long) --> signed char &", pybind11::return_value_policy::reference_internal, pybind11::arg("row"), pybind11::arg("col"));
+		cl.def("begin", (class __gnu_cxx::__normal_iterator<signed char *, class std::vector<signed char, class std::allocator<signed char> > > (genesis::utils::Matrix<signed char>::*)()) &genesis::utils::Matrix<signed char>::begin, "C++: genesis::utils::Matrix<signed char>::begin() --> class __gnu_cxx::__normal_iterator<signed char *, class std::vector<signed char, class std::allocator<signed char> > >");
+		cl.def("end", (class __gnu_cxx::__normal_iterator<signed char *, class std::vector<signed char, class std::allocator<signed char> > > (genesis::utils::Matrix<signed char>::*)()) &genesis::utils::Matrix<signed char>::end, "C++: genesis::utils::Matrix<signed char>::end() --> class __gnu_cxx::__normal_iterator<signed char *, class std::vector<signed char, class std::allocator<signed char> > >");
+		cl.def("cbegin", (class __gnu_cxx::__normal_iterator<const signed char *, class std::vector<signed char, class std::allocator<signed char> > > (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::cbegin, "C++: genesis::utils::Matrix<signed char>::cbegin() const --> class __gnu_cxx::__normal_iterator<const signed char *, class std::vector<signed char, class std::allocator<signed char> > >");
+		cl.def("cend", (class __gnu_cxx::__normal_iterator<const signed char *, class std::vector<signed char, class std::allocator<signed char> > > (genesis::utils::Matrix<signed char>::*)() const) &genesis::utils::Matrix<signed char>::cend, "C++: genesis::utils::Matrix<signed char>::cend() const --> class __gnu_cxx::__normal_iterator<const signed char *, class std::vector<signed char, class std::allocator<signed char> > >");
+		cl.def("__eq__", (bool (genesis::utils::Matrix<signed char>::*)(const class genesis::utils::Matrix<signed char> &) const) &genesis::utils::Matrix<signed char>::operator==, "C++: genesis::utils::Matrix<signed char>::operator==(const class genesis::utils::Matrix<signed char> &) const --> bool", pybind11::arg("other"));
+		cl.def("__ne__", (bool (genesis::utils::Matrix<signed char>::*)(const class genesis::utils::Matrix<signed char> &) const) &genesis::utils::Matrix<signed char>::operator!=, "C++: genesis::utils::Matrix<signed char>::operator!=(const class genesis::utils::Matrix<signed char> &) const --> bool", pybind11::arg("other"));
 
 		extend_matrix(cl);
 	}
-	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:50
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<signed char> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<signed char> &)) &genesis::utils::transpose_inplace<signed char>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<signed char> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
 		pybind11::class_<genesis::utils::Matrix<pybind11::object>, std::shared_ptr<genesis::utils::Matrix<pybind11::object>>> cl(M("genesis::utils"), "Matrix_pybind11_object_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<pybind11::object>(); } ) );
 		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
@@ -99,25 +128,6 @@ void bind_genesis_utils_containers_matrix_1(std::function< pybind11::module &(st
 		cl.def("__eq__", (bool (genesis::utils::Matrix<pybind11::object>::*)(const class genesis::utils::Matrix<class pybind11::object> &) const) &genesis::utils::Matrix<pybind11::object>::operator==, "C++: genesis::utils::Matrix<pybind11::object>::operator==(const class genesis::utils::Matrix<class pybind11::object> &) const --> bool", pybind11::arg("other"));
 		cl.def("__ne__", (bool (genesis::utils::Matrix<pybind11::object>::*)(const class genesis::utils::Matrix<class pybind11::object> &) const) &genesis::utils::Matrix<pybind11::object>::operator!=, "C++: genesis::utils::Matrix<pybind11::object>::operator!=(const class genesis::utils::Matrix<class pybind11::object> &) const --> bool", pybind11::arg("other"));
 
-		cl.def("__str__", [](genesis::utils::Matrix<pybind11::object> const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
-
 		extend_matrix(cl);
-	}
-	{ // genesis::utils::MatrixRow file:genesis/utils/containers/matrix/row.hpp line:60
-		pybind11::class_<genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>, std::shared_ptr<genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>>> cl(M("genesis::utils"), "MatrixRow_genesis_utils_Matrix_unsigned_int_unsigned_int_t", "");
-		cl.def( pybind11::init<class genesis::utils::Matrix<unsigned int> &, unsigned long>(), pybind11::arg("mat"), pybind11::arg("row") );
-
-		cl.def( pybind11::init( [](genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int> const &o){ return new genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>(o); } ) );
-		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
-		cl.def("at", (unsigned int & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(unsigned long) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::at, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::at(unsigned long) const --> unsigned int &", pybind11::return_value_policy::reference_internal, pybind11::arg("column"));
-		cl.def("__getitem__", (unsigned int & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(unsigned long) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator[], "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator[](unsigned long) const --> unsigned int &", pybind11::return_value_policy::reference_internal, pybind11::arg("column"));
-		cl.def("matrix", (class genesis::utils::Matrix<unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::matrix, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::matrix() const --> class genesis::utils::Matrix<unsigned int> &", pybind11::return_value_policy::reference_internal);
-		cl.def("row", (unsigned long (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::row, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::row() const --> unsigned long");
-		cl.def("size", (unsigned long (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::size, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::size() const --> unsigned long");
-		cl.def("to_vector", (class std::vector<unsigned int, class std::allocator<unsigned int> > (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)() const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::to_vector, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::to_vector() const --> class std::vector<unsigned int, class std::allocator<unsigned int> >");
-		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class std::vector<unsigned int, class std::allocator<unsigned int> > &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator=(const class std::vector<unsigned int, class std::allocator<unsigned int> > &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg("vec"));
-		cl.def("assign", (class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> & (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &)) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::assign, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::assign(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) --> class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &", pybind11::return_value_policy::reference_internal, pybind11::arg("other"));
-		cl.def("__eq__", (bool (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator==, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator==(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const --> bool", pybind11::arg("other"));
-		cl.def("__ne__", (bool (genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>,unsigned int>::*)(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const) &genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator!=, "C++: genesis::utils::MatrixRow<genesis::utils::Matrix<unsigned int>, unsigned int>::operator!=(const class genesis::utils::MatrixRow<class genesis::utils::Matrix<unsigned int>, unsigned int> &) const --> bool", pybind11::arg("other"));
 	}
 }

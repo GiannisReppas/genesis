@@ -1,14 +1,20 @@
 #include <functional>
 #include <genesis/utils/io/base_input_source.hpp>
 #include <genesis/utils/io/input_reader.hpp>
+#include <genesis/utils/io/input_source.hpp>
 #include <genesis/utils/io/input_stream.hpp>
 #include <genesis/utils/text/char.hpp>
+#include <ios>
+#include <istream>
 #include <iterator>
+#include <locale>
 #include <memory>
 #include <sstream> // __str__
+#include <streambuf>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <functional>
 #include <pybind11/pybind11.h>
@@ -40,8 +46,14 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_io_input_reader(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_io_input_source(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	// genesis::utils::from_strings(const class std::vector<std::string, class std::allocator<std::string > > &) file:genesis/utils/io/input_source.hpp line:147
+	M("genesis::utils").def("from_strings", (class std::vector<class std::shared_ptr<class genesis::utils::BaseInputSource>, class std::allocator<class std::shared_ptr<class genesis::utils::BaseInputSource> > > (*)(const class std::vector<std::string, class std::allocator<std::string > > &)) &genesis::utils::from_strings, "Obtain a set of input sources for reading from strings.\n\n See from_string() and from_files() for details.\n\n \n from_file(), from_files(), from_string(), and from_stream() for similar\n helper functions for other types of input sources.\n\nC++: genesis::utils::from_strings(const class std::vector<std::string, class std::allocator<std::string > > &) --> class std::vector<class std::shared_ptr<class genesis::utils::BaseInputSource>, class std::allocator<class std::shared_ptr<class genesis::utils::BaseInputSource> > >", pybind11::arg("input_strings"));
+
+	// genesis::utils::from_stream(std::istream &) file:genesis/utils/io/input_source.hpp line:187
+	M("genesis::utils").def("from_stream", (class std::shared_ptr<class genesis::utils::BaseInputSource> (*)(std::istream &)) &genesis::utils::from_stream, "Obtain an input source for reading from a stream.\n\n The input source returned from this function can be used in the reader classes, e.g.,\n placement::JplaceReader or sequence::FastaReader.\n\n \n from_file(), from_files(), from_string(), and from_strings() for similar\n helper functions for other types of input sources.\n\nC++: genesis::utils::from_stream(std::istream &) --> class std::shared_ptr<class genesis::utils::BaseInputSource>", pybind11::arg("input_stream"));
+
 	{ // genesis::utils::SynchronousReader file:genesis/utils/io/input_reader.hpp line:244
 		pybind11::class_<genesis::utils::SynchronousReader, std::shared_ptr<genesis::utils::SynchronousReader>> cl(M("genesis::utils"), "SynchronousReader", "Read bytes from an \n\n\n\n\n\n\n\n\n\n\n\n");
 		cl.def( pybind11::init( [](){ return new genesis::utils::SynchronousReader(); } ) );

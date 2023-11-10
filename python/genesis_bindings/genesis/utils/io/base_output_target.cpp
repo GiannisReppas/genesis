@@ -3,12 +3,13 @@
 #include <genesis/utils/core/thread_pool.hpp>
 #include <genesis/utils/io/base_output_target.hpp>
 #include <genesis/utils/io/file_output_target.hpp>
+#include <genesis/utils/io/gzip_block_ostream.hpp>
 #include <genesis/utils/io/gzip_stream.hpp>
 #include <genesis/utils/io/output_stream.hpp>
 #include <genesis/utils/io/strict_fstream.hpp>
-#include <genesis/utils/text/string.hpp>
 #include <ios>
 #include <iterator>
+#include <locale>
 #include <memory>
 #include <ostream>
 #include <random>
@@ -47,12 +48,8 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_text_string_2(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_io_base_output_target(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	// genesis::utils::join(const class std::vector<unsigned char, class std::allocator<unsigned char> > &, const std::string &) file:genesis/utils/text/string.hpp line:673
-	M("genesis::utils").def("join", [](const class std::vector<unsigned char, class std::allocator<unsigned char> > & a0) -> std::string { return genesis::utils::join(a0); }, "", pybind11::arg("v"));
-	M("genesis::utils").def("join", (std::string (*)(const class std::vector<unsigned char, class std::allocator<unsigned char> > &, const std::string &)) &genesis::utils::join<std::vector<unsigned char, std::allocator<unsigned char> >>, "Template specialization of join() for vector of unsigned char.\n\n We need this specialization, as the unsigned chars are otherwise turned into their char (ASCII)\n equivalent, which we do not want. Instead, we want to output them here as plain numbers.\n\nC++: genesis::utils::join(const class std::vector<unsigned char, class std::allocator<unsigned char> > &, const std::string &) --> std::string", pybind11::arg("v"), pybind11::arg("delimiter"));
-
 	{ // genesis::utils::BaseOutputTarget file:genesis/utils/io/base_output_target.hpp line:59
 		pybind11::class_<genesis::utils::BaseOutputTarget, std::shared_ptr<genesis::utils::BaseOutputTarget>> cl(M("genesis::utils"), "BaseOutputTarget", "Abstract base class for writing data to an output target.\n\n The class is an interface that allows writing to different targets, and adds a layer of abstraction\n around using simple `std::ostream` functionality. In particular, we want to add some checks,\n naming of the streams, etc. Internally however, the derived classes of this base class use\n `std::ostream`, and make it accessible.\n\n \n FileOutputTarget, GzipOutputTarget, StreamOutputTarget, StringOutputTarget for our derived\n output target classes.\n \n\n to_file(), to_gzip_block_file(), to_stream(), to_string() for helper functions to create\n these classes, to add some syntactic sugar and make it easy to use.");
 		cl.def("assign", (class genesis::utils::BaseOutputTarget & (genesis::utils::BaseOutputTarget::*)(const class genesis::utils::BaseOutputTarget &)) &genesis::utils::BaseOutputTarget::operator=, "C++: genesis::utils::BaseOutputTarget::operator=(const class genesis::utils::BaseOutputTarget &) --> class genesis::utils::BaseOutputTarget &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
@@ -112,4 +109,17 @@ void bind_genesis_utils_text_string_2(std::function< pybind11::module &(std::str
 
 ;
 
+	{ // genesis::utils::GzipBlockOStream file:genesis/utils/io/gzip_block_ostream.hpp line:90
+		pybind11::class_<genesis::utils::GzipBlockOStream, std::shared_ptr<genesis::utils::GzipBlockOStream>, std::ostream> cl(M("genesis::utils"), "GzipBlockOStream", "Output stream that writes blocks of gzip-compressed data to an underlying wrapped stream,\n using parallel compression.\n\n The gzip format specifies that concatenated blocks of gzip-compressed data (including the gzip\n header) are still valid gzip files, and are equivalent to concatenating the decompressed data.\n This is for example used in compressed vcf files (.vcf.gz, Variant Calling Format) to achieve\n random access into compressed data, by maintaining an index table of offsets to the beginning\n of individual compressed blocks.\n\n We here use a similar technique to achieve a compression speedup by using parallel threads\n on different gzip blocks. This gives almost linear speedup, at the cost of ~3% increase in\n resulting file size due to the additional gzip headers of each block. This downside can be\n alleivated by using larger blocks though. By default, we use 64kB blocks.\n\n Exemplary usage:\n\n     // Wrapped output stream to write to. Use binary mode, so that compressed output works.\n     std::ofstream ofile;\n     ofile.open( \"path/to/test.txt.gz\", std::ios_base::binary );\n\n     // Prepare stream\n     GzipBlockOStream ostr( ofile );\n\n     // Write data to stream\n     ostr << \"some data\";\n\n By default, the number of threads is determined using the number of available threads in an\n OpenMP parallel region. If set manually via  to a value other than 0, we recommend\n to use not more than the hardware concurrency, or fewer, if at the same time compressed data is\n read in some other part of the program, or other computation-heavy work is done.\n\n Furthermore, note that some file managers might not display the original (uncompressed) file size\n correctly when viewing the resulting gz file, as they might use only the size of one block\n instead of the full resulting uncompressed file size. This should not affect decompression or any\n other downstream processes though. As this class is a stream, we usually do not know beforehand\n how lare the resulting file will be, so there is not much we can do about this.\n\n The class could also be extended in the future to achieve indexing similar to compressed vcf.\n NB: We have not yet tested compatibility with the vcf format, as they might employ additional\n tricks to achieve their goals.");
+		cl.def( pybind11::init( [](std::ostream & a0){ return new genesis::utils::GzipBlockOStream(a0); } ), "doc" , pybind11::arg("os"));
+		cl.def( pybind11::init( [](std::ostream & a0, unsigned long const & a1){ return new genesis::utils::GzipBlockOStream(a0, a1); } ), "doc" , pybind11::arg("os"), pybind11::arg("block_size"));
+		cl.def( pybind11::init( [](std::ostream & a0, unsigned long const & a1, enum genesis::utils::GzipCompressionLevel const & a2){ return new genesis::utils::GzipBlockOStream(a0, a1, a2); } ), "doc" , pybind11::arg("os"), pybind11::arg("block_size"), pybind11::arg("compression_level"));
+		cl.def( pybind11::init<std::ostream &, unsigned long, enum genesis::utils::GzipCompressionLevel, unsigned long>(), pybind11::arg("os"), pybind11::arg("block_size"), pybind11::arg("compression_level"), pybind11::arg("num_threads") );
+
+		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0){ return new genesis::utils::GzipBlockOStream(a0); } ), "doc" , pybind11::arg("sbuf_p"));
+		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0, unsigned long const & a1){ return new genesis::utils::GzipBlockOStream(a0, a1); } ), "doc" , pybind11::arg("sbuf_p"), pybind11::arg("block_size"));
+		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0, unsigned long const & a1, enum genesis::utils::GzipCompressionLevel const & a2){ return new genesis::utils::GzipBlockOStream(a0, a1, a2); } ), "doc" , pybind11::arg("sbuf_p"), pybind11::arg("block_size"), pybind11::arg("compression_level"));
+		cl.def( pybind11::init<class std::basic_streambuf<char> *, unsigned long, enum genesis::utils::GzipCompressionLevel, unsigned long>(), pybind11::arg("sbuf_p"), pybind11::arg("block_size"), pybind11::arg("compression_level"), pybind11::arg("num_threads") );
+
+	}
 }

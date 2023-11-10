@@ -1,13 +1,9 @@
+#include <genesis/utils/color/color.hpp>
 #include <genesis/utils/containers/matrix.hpp>
-#include <genesis/utils/containers/matrix/operators.hpp>
 #include <genesis/utils/containers/matrix/row.hpp>
-#include <ios>
 #include <iterator>
-#include <locale>
 #include <memory>
-#include <ostream>
 #include <sstream> // __str__
-#include <streambuf>
 #include <string>
 #include <vector>
 
@@ -43,7 +39,10 @@
 
 void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:50
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<class genesis::utils::Color> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<class genesis::utils::Color> &)) &genesis::utils::transpose_inplace<genesis::utils::Color>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<class genesis::utils::Color> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
 		pybind11::class_<genesis::utils::Matrix<double>, std::shared_ptr<genesis::utils::Matrix<double>>> cl(M("genesis::utils"), "Matrix_double_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<double>(); } ) );
 		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
@@ -69,11 +68,12 @@ void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std:
 		cl.def("__eq__", (bool (genesis::utils::Matrix<double>::*)(const class genesis::utils::Matrix<double> &) const) &genesis::utils::Matrix<double>::operator==, "C++: genesis::utils::Matrix<double>::operator==(const class genesis::utils::Matrix<double> &) const --> bool", pybind11::arg("other"));
 		cl.def("__ne__", (bool (genesis::utils::Matrix<double>::*)(const class genesis::utils::Matrix<double> &) const) &genesis::utils::Matrix<double>::operator!=, "C++: genesis::utils::Matrix<double>::operator!=(const class genesis::utils::Matrix<double> &) const --> bool", pybind11::arg("other"));
 
-		cl.def("__str__", [](genesis::utils::Matrix<double> const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
-
 		extend_matrix(cl);
 	}
-	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:50
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<double> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<double> &)) &genesis::utils::transpose_inplace<double>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<double> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
 		pybind11::class_<genesis::utils::Matrix<unsigned int>, std::shared_ptr<genesis::utils::Matrix<unsigned int>>> cl(M("genesis::utils"), "Matrix_unsigned_int_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<unsigned int>(); } ) );
 		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
@@ -100,11 +100,12 @@ void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std:
 		cl.def("__eq__", (bool (genesis::utils::Matrix<unsigned int>::*)(const class genesis::utils::Matrix<unsigned int> &) const) &genesis::utils::Matrix<unsigned int>::operator==, "C++: genesis::utils::Matrix<unsigned int>::operator==(const class genesis::utils::Matrix<unsigned int> &) const --> bool", pybind11::arg("other"));
 		cl.def("__ne__", (bool (genesis::utils::Matrix<unsigned int>::*)(const class genesis::utils::Matrix<unsigned int> &) const) &genesis::utils::Matrix<unsigned int>::operator!=, "C++: genesis::utils::Matrix<unsigned int>::operator!=(const class genesis::utils::Matrix<unsigned int> &) const --> bool", pybind11::arg("other"));
 
-		cl.def("__str__", [](genesis::utils::Matrix<unsigned int> const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
-
 		extend_matrix(cl);
 	}
-	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:50
+	// genesis::utils::transpose_inplace(class genesis::utils::Matrix<unsigned int> &) file:genesis/utils/containers/matrix.hpp line:170
+	M("genesis::utils").def("transpose_inplace", (void (*)(class genesis::utils::Matrix<unsigned int> &)) &genesis::utils::transpose_inplace<unsigned int>, "C++: genesis::utils::transpose_inplace(class genesis::utils::Matrix<unsigned int> &) --> void", pybind11::arg(""));
+
+	{ // genesis::utils::Matrix file:genesis/utils/containers/matrix.hpp line:60
 		pybind11::class_<genesis::utils::Matrix<int>, std::shared_ptr<genesis::utils::Matrix<int>>> cl(M("genesis::utils"), "Matrix_int_t", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Matrix<int>(); } ) );
 		cl.def( pybind11::init<unsigned long, unsigned long>(), pybind11::arg("rows"), pybind11::arg("cols") );
@@ -129,8 +130,6 @@ void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std:
 		cl.def("cend", (class __gnu_cxx::__normal_iterator<const int *, class std::vector<int, class std::allocator<int> > > (genesis::utils::Matrix<int>::*)() const) &genesis::utils::Matrix<int>::cend, "C++: genesis::utils::Matrix<int>::cend() const --> class __gnu_cxx::__normal_iterator<const int *, class std::vector<int, class std::allocator<int> > >");
 		cl.def("__eq__", (bool (genesis::utils::Matrix<int>::*)(const class genesis::utils::Matrix<int> &) const) &genesis::utils::Matrix<int>::operator==, "C++: genesis::utils::Matrix<int>::operator==(const class genesis::utils::Matrix<int> &) const --> bool", pybind11::arg("other"));
 		cl.def("__ne__", (bool (genesis::utils::Matrix<int>::*)(const class genesis::utils::Matrix<int> &) const) &genesis::utils::Matrix<int>::operator!=, "C++: genesis::utils::Matrix<int>::operator!=(const class genesis::utils::Matrix<int> &) const --> bool", pybind11::arg("other"));
-
-		cl.def("__str__", [](genesis::utils::Matrix<int> const &o) -> std::string { std::ostringstream s; genesis::utils::operator<<(s, o); return s.str(); } );
 
 		extend_matrix(cl);
 	}

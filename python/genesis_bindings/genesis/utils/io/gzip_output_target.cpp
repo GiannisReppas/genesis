@@ -1,10 +1,10 @@
 #include <genesis/utils/io/base_output_target.hpp>
-#include <genesis/utils/io/gzip_block_ostream.hpp>
 #include <genesis/utils/io/gzip_output_target.hpp>
 #include <genesis/utils/io/gzip_stream.hpp>
 #include <genesis/utils/io/output_target.hpp>
 #include <genesis/utils/io/stream_output_target.hpp>
 #include <genesis/utils/io/string_output_target.hpp>
+#include <genesis/utils/math/common.hpp>
 #include <ios>
 #include <iterator>
 #include <locale>
@@ -13,6 +13,8 @@
 #include <sstream> // __str__
 #include <streambuf>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include <functional>
 #include <pybind11/pybind11.h>
@@ -44,21 +46,8 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_io_gzip_block_ostream(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_io_gzip_output_target(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	{ // genesis::utils::GzipBlockOStream file:genesis/utils/io/gzip_block_ostream.hpp line:90
-		pybind11::class_<genesis::utils::GzipBlockOStream, std::shared_ptr<genesis::utils::GzipBlockOStream>, std::ostream> cl(M("genesis::utils"), "GzipBlockOStream", "Output stream that writes blocks of gzip-compressed data to an underlying wrapped stream,\n using parallel compression.\n\n The gzip format specifies that concatenated blocks of gzip-compressed data (including the gzip\n header) are still valid gzip files, and are equivalent to concatenating the decompressed data.\n This is for example used in compressed vcf files (.vcf.gz, Variant Calling Format) to achieve\n random access into compressed data, by maintaining an index table of offsets to the beginning\n of individual compressed blocks.\n\n We here use a similar technique to achieve a compression speedup by using parallel threads\n on different gzip blocks. This gives almost linear speedup, at the cost of ~3% increase in\n resulting file size due to the additional gzip headers of each block. This downside can be\n alleivated by using larger blocks though. By default, we use 64kB blocks.\n\n Exemplary usage:\n\n     // Wrapped output stream to write to. Use binary mode, so that compressed output works.\n     std::ofstream ofile;\n     ofile.open( \"path/to/test.txt.gz\", std::ios_base::binary );\n\n     // Prepare stream\n     GzipBlockOStream ostr( ofile );\n\n     // Write data to stream\n     ostr << \"some data\";\n\n By default, the number of threads is determined using the number of available threads in an\n OpenMP parallel region. If set manually via  to a value other than 0, we recommend\n to use not more than the hardware concurrency, or fewer, if at the same time compressed data is\n read in some other part of the program, or other computation-heavy work is done.\n\n Furthermore, note that some file managers might not display the original (uncompressed) file size\n correctly when viewing the resulting gz file, as they might use only the size of one block\n instead of the full resulting uncompressed file size. This should not affect decompression or any\n other downstream processes though. As this class is a stream, we usually do not know beforehand\n how lare the resulting file will be, so there is not much we can do about this.\n\n The class could also be extended in the future to achieve indexing similar to compressed vcf.\n NB: We have not yet tested compatibility with the vcf format, as they might employ additional\n tricks to achieve their goals.");
-		cl.def( pybind11::init( [](std::ostream & a0){ return new genesis::utils::GzipBlockOStream(a0); } ), "doc" , pybind11::arg("os"));
-		cl.def( pybind11::init( [](std::ostream & a0, unsigned long const & a1){ return new genesis::utils::GzipBlockOStream(a0, a1); } ), "doc" , pybind11::arg("os"), pybind11::arg("block_size"));
-		cl.def( pybind11::init( [](std::ostream & a0, unsigned long const & a1, enum genesis::utils::GzipCompressionLevel const & a2){ return new genesis::utils::GzipBlockOStream(a0, a1, a2); } ), "doc" , pybind11::arg("os"), pybind11::arg("block_size"), pybind11::arg("compression_level"));
-		cl.def( pybind11::init<std::ostream &, unsigned long, enum genesis::utils::GzipCompressionLevel, unsigned long>(), pybind11::arg("os"), pybind11::arg("block_size"), pybind11::arg("compression_level"), pybind11::arg("num_threads") );
-
-		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0){ return new genesis::utils::GzipBlockOStream(a0); } ), "doc" , pybind11::arg("sbuf_p"));
-		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0, unsigned long const & a1){ return new genesis::utils::GzipBlockOStream(a0, a1); } ), "doc" , pybind11::arg("sbuf_p"), pybind11::arg("block_size"));
-		cl.def( pybind11::init( [](class std::basic_streambuf<char> * a0, unsigned long const & a1, enum genesis::utils::GzipCompressionLevel const & a2){ return new genesis::utils::GzipBlockOStream(a0, a1, a2); } ), "doc" , pybind11::arg("sbuf_p"), pybind11::arg("block_size"), pybind11::arg("compression_level"));
-		cl.def( pybind11::init<class std::basic_streambuf<char> *, unsigned long, enum genesis::utils::GzipCompressionLevel, unsigned long>(), pybind11::arg("sbuf_p"), pybind11::arg("block_size"), pybind11::arg("compression_level"), pybind11::arg("num_threads") );
-
-	}
 	{ // genesis::utils::GzipOutputTarget file:genesis/utils/io/gzip_output_target.hpp line:61
 		pybind11::class_<genesis::utils::GzipOutputTarget, std::shared_ptr<genesis::utils::GzipOutputTarget>, genesis::utils::BaseOutputTarget> cl(M("genesis::utils"), "GzipOutputTarget", "Output target for writing byte data to a gzip/zlib-compressed target.\n\n This output target is a wrapper that takes some other output target\n (FileOutputTarget, StringOutputTarget, StreamOutputTarget, etc),\n and compresses using the gzip format on the fly while writing to that other target.\n\n The class can be moved, but not copied, because of the internal state that is kept for\n compression, and which would mess up the output if copied.");
 		cl.def( pybind11::init( [](class std::shared_ptr<class genesis::utils::BaseOutputTarget> const & a0){ return new genesis::utils::GzipOutputTarget(a0); } ), "doc" , pybind11::arg("output_target"));
@@ -106,5 +95,30 @@ void bind_genesis_utils_io_gzip_block_ostream(std::function< pybind11::module &(
 
 	// genesis::utils::to_string(std::string &) file:genesis/utils/io/output_target.hpp line:195
 	M("genesis::utils").def("to_string", (class std::shared_ptr<class genesis::utils::BaseOutputTarget> (*)(std::string &)) &genesis::utils::to_string, "Obtain an output target for writing to a string.\n\n The output target returned from this function can be used in the writer classes, e.g.,\n placement::JplaceWriter or sequence::FastaWriter.\n\nC++: genesis::utils::to_string(std::string &) --> class std::shared_ptr<class genesis::utils::BaseOutputTarget>", pybind11::arg("target_string"));
+
+	// genesis::utils::circumference(double) file:genesis/utils/math/common.hpp line:57
+	M("genesis::utils").def("circumference", (double (*)(double)) &genesis::utils::circumference, "C++: genesis::utils::circumference(double) --> double", pybind11::arg("radius"));
+
+	// genesis::utils::almost_equal_relative(double, double, double) file:genesis/utils/math/common.hpp line:157
+	M("genesis::utils").def("almost_equal_relative", [](double const & a0, double const & a1) -> bool { return genesis::utils::almost_equal_relative(a0, a1); }, "", pybind11::arg("lhs"), pybind11::arg("rhs"));
+	M("genesis::utils").def("almost_equal_relative", (bool (*)(double, double, double)) &genesis::utils::almost_equal_relative, "Check whether two doubles are almost equal, using a relative epsilon to compare them.\n\nC++: genesis::utils::almost_equal_relative(double, double, double) --> bool", pybind11::arg("lhs"), pybind11::arg("rhs"), pybind11::arg("max_rel_diff"));
+
+	// genesis::utils::round_to(double, unsigned long) file:genesis/utils/math/common.hpp line:175
+	M("genesis::utils").def("round_to", (double (*)(double, unsigned long)) &genesis::utils::round_to, "Retun the value of `x`, rounded to the decimal digit given by `accuracy_order`.\n\nC++: genesis::utils::round_to(double, unsigned long) --> double", pybind11::arg("x"), pybind11::arg("accuracy_order"));
+
+	// genesis::utils::int_pow(unsigned long, unsigned long) file:genesis/utils/math/common.hpp line:191
+	M("genesis::utils").def("int_pow", (unsigned long (*)(unsigned long, unsigned long)) &genesis::utils::int_pow, "Calculate the power `base^exp` for positive integer values.\n\n Remark: This overflows quite easily. The function does not check whether the desired power\n actually fits within `size_t`. Use is_valid_int_pow() to check for this first.\n\n Rationale for this function: One could argue that int powers are not really useful, particularly\n because of the fast overflow. However, using doubles leads to rounding errors, at least for\n bigger numbers. So, within the valid range, this function is more accurate. Also, it is faster.\n\nC++: genesis::utils::int_pow(unsigned long, unsigned long) --> unsigned long", pybind11::arg("base"), pybind11::arg("exp"));
+
+	// genesis::utils::is_valid_int_pow(unsigned long, unsigned long) file:genesis/utils/math/common.hpp line:211
+	M("genesis::utils").def("is_valid_int_pow", (bool (*)(unsigned long, unsigned long)) &genesis::utils::is_valid_int_pow, "Return whether the given power can be stored within a `size_t`.\n\n Use int_pow() to calculate the actual value of the power.\n\nC++: genesis::utils::is_valid_int_pow(unsigned long, unsigned long) --> bool", pybind11::arg("base"), pybind11::arg("exp"));
+
+	// genesis::utils::squared(double) file:genesis/utils/math/common.hpp line:223
+	M("genesis::utils").def("squared", (double (*)(double)) &genesis::utils::squared, "Square of a number.\n\n Simply \n, but faster than `std::pow` for the low exponent. Meant as an abbreviation\n where the argument is not already a variable, e.g., `squared( x - 1.0 )`,\n without the need to store the intermediate argument term.\n\nC++: genesis::utils::squared(double) --> double", pybind11::arg("x"));
+
+	// genesis::utils::cubed(double) file:genesis/utils/math/common.hpp line:235
+	M("genesis::utils").def("cubed", (double (*)(double)) &genesis::utils::cubed, "Cube of a number.\n\n Simply \n, but faster than `std::pow` for the low exponent. Meant as an abbreviation\n where the argument is not already a variable, e.g., `cubed( x - 1.0 )`,\n without the need to store the intermediate argument term.\n\nC++: genesis::utils::cubed(double) --> double", pybind11::arg("x"));
+
+	// genesis::utils::finite_pairs(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >) file:genesis/utils/math/common.hpp line:252
+	M("genesis::utils").def("finite_pairs", (struct std::pair<class std::vector<double, class std::allocator<double> >, class std::vector<double, class std::allocator<double> > > (*)(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >)) &genesis::utils::finite_pairs<__gnu_cxx::__normal_iterator<const double *, std::vector<double, std::allocator<double> > >,__gnu_cxx::__normal_iterator<const double *, std::vector<double, std::allocator<double> > >>, "C++: genesis::utils::finite_pairs(class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >, class __gnu_cxx::__normal_iterator<const double *, class std::vector<double, class std::allocator<double> > >) --> struct std::pair<class std::vector<double, class std::allocator<double> >, class std::vector<double, class std::allocator<double> > >", pybind11::arg("first_a"), pybind11::arg("last_a"), pybind11::arg("first_b"), pybind11::arg("last_b"));
 
 }

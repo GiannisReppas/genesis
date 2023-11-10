@@ -32,7 +32,7 @@ public:
     {
         target_ = ::genesis::utils::to_string( data_ );
     }
-    
+
     ~StringTarget() = default;
 
     StringTarget(StringTarget const&) = default;

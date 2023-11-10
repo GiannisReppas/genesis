@@ -1,7 +1,6 @@
 #include <functional>
 #include <genesis/utils/color/color.hpp>
 #include <genesis/utils/formats/svg/axis.hpp>
-#include <genesis/utils/formats/svg/color_bar.hpp>
 #include <genesis/utils/formats/svg/definitions.hpp>
 #include <genesis/utils/formats/svg/gradient.hpp>
 #include <genesis/utils/formats/svg/group.hpp>
@@ -94,9 +93,10 @@ void bind_genesis_utils_formats_svg_group(std::function< pybind11::module &(std:
 	M("genesis::utils").def("make_svg_axis", [](const struct genesis::utils::SvgAxisSettings & a0, const class std::map<double, std::string, struct std::less<double>, class std::allocator<struct std::pair<const double, std::string > > > & a1) -> genesis::utils::SvgGroup { return genesis::utils::make_svg_axis(a0, a1); }, "", pybind11::arg("settings"), pybind11::arg("labels"));
 	M("genesis::utils").def("make_svg_axis", (struct genesis::utils::SvgGroup (*)(const struct genesis::utils::SvgAxisSettings &, const class std::map<double, std::string, struct std::less<double>, class std::allocator<struct std::pair<const double, std::string > > > &, const std::string &)) &genesis::utils::make_svg_axis, "Simple helper to make an axis.\n\n The helper currently only draws lines and puts the  alongside. The given \n have already to be pre-computed, with their position (`first` of the map) being their relative\n position in `[ 0.0, 1.0 ]` along the axis.\n\nC++: genesis::utils::make_svg_axis(const struct genesis::utils::SvgAxisSettings &, const class std::map<double, std::string, struct std::less<double>, class std::allocator<struct std::pair<const double, std::string > > > &, const std::string &) --> struct genesis::utils::SvgGroup", pybind11::arg("settings"), pybind11::arg("labels"), pybind11::arg("name"));
 
-	// genesis::utils::make_svg_axis(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &) file:genesis/utils/formats/svg/axis.hpp line:119
+	// genesis::utils::make_svg_axis(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &, bool) file:genesis/utils/formats/svg/axis.hpp line:127
 	M("genesis::utils").def("make_svg_axis", [](const struct genesis::utils::SvgAxisSettings & a0, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > & a1) -> genesis::utils::SvgGroup { return genesis::utils::make_svg_axis(a0, a1); }, "", pybind11::arg("settings"), pybind11::arg("labels"));
-	M("genesis::utils").def("make_svg_axis", (struct genesis::utils::SvgGroup (*)(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &)) &genesis::utils::make_svg_axis, "C++: genesis::utils::make_svg_axis(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &) --> struct genesis::utils::SvgGroup", pybind11::arg("settings"), pybind11::arg("labels"), pybind11::arg("name"));
+	M("genesis::utils").def("make_svg_axis", [](const struct genesis::utils::SvgAxisSettings & a0, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > & a1, const std::string & a2) -> genesis::utils::SvgGroup { return genesis::utils::make_svg_axis(a0, a1, a2); }, "", pybind11::arg("settings"), pybind11::arg("labels"), pybind11::arg("name"));
+	M("genesis::utils").def("make_svg_axis", (struct genesis::utils::SvgGroup (*)(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &, bool)) &genesis::utils::make_svg_axis, "Simple helper to make an axis.\n\n This overload of the function takes the result of the Tickmarks class when creating labels,\n and forwards it to the other overload that takes string labeles instead, for convenience.\n When using  (default `true`), `std::round` is called on the label values first,\n in order to print integer numbers.\n\nC++: genesis::utils::make_svg_axis(const struct genesis::utils::SvgAxisSettings &, const class std::vector<struct genesis::utils::Tickmarks::LabeledTick, class std::allocator<struct genesis::utils::Tickmarks::LabeledTick> > &, const std::string &, bool) --> struct genesis::utils::SvgGroup", pybind11::arg("settings"), pybind11::arg("labels"), pybind11::arg("name"), pybind11::arg("round_labels"));
 
 	{ // genesis::utils::SvgDefinitions file:genesis/utils/formats/svg/definitions.hpp line:47
 		pybind11::class_<genesis::utils::SvgDefinitions, std::shared_ptr<genesis::utils::SvgDefinitions>> cl(M("genesis::utils"), "SvgDefinitions", "");
@@ -144,23 +144,5 @@ void bind_genesis_utils_formats_svg_group(std::function< pybind11::module &(std:
 		cl.def("set_stops", (struct genesis::utils::SvgGradientLinear & (genesis::utils::SvgGradientLinear::*)(const class std::map<double, class genesis::utils::Color, struct std::less<double>, class std::allocator<struct std::pair<const double, class genesis::utils::Color> > > &)) &genesis::utils::SvgGradientLinear::set_stops, "C++: genesis::utils::SvgGradientLinear::set_stops(const class std::map<double, class genesis::utils::Color, struct std::less<double>, class std::allocator<struct std::pair<const double, class genesis::utils::Color> > > &) --> struct genesis::utils::SvgGradientLinear &", pybind11::return_value_policy::reference_internal, pybind11::arg("ranges"));
 		cl.def("add_stop", (struct genesis::utils::SvgGradientLinear & (genesis::utils::SvgGradientLinear::*)(const struct genesis::utils::SvgGradientStop &)) &genesis::utils::SvgGradientLinear::add_stop, "C++: genesis::utils::SvgGradientLinear::add_stop(const struct genesis::utils::SvgGradientStop &) --> struct genesis::utils::SvgGradientLinear &", pybind11::return_value_policy::reference_internal, pybind11::arg("stop"));
 		cl.def("empty", (bool (genesis::utils::SvgGradientLinear::*)() const) &genesis::utils::SvgGradientLinear::empty, "C++: genesis::utils::SvgGradientLinear::empty() const --> bool");
-	}
-	{ // genesis::utils::SvgColorBarSettings file:genesis/utils/formats/svg/color_bar.hpp line:59
-		pybind11::class_<genesis::utils::SvgColorBarSettings, std::shared_ptr<genesis::utils::SvgColorBarSettings>> cl(M("genesis::utils"), "SvgColorBarSettings", "");
-		cl.def( pybind11::init( [](){ return new genesis::utils::SvgColorBarSettings(); } ) );
-
-		pybind11::enum_<genesis::utils::SvgColorBarSettings::Direction>(cl, "Direction", "")
-			.value("kTopToBottom", genesis::utils::SvgColorBarSettings::Direction::kTopToBottom)
-			.value("kBottomToTop", genesis::utils::SvgColorBarSettings::Direction::kBottomToTop)
-			.value("kLeftToRight", genesis::utils::SvgColorBarSettings::Direction::kLeftToRight)
-			.value("kRightToLeft", genesis::utils::SvgColorBarSettings::Direction::kRightToLeft);
-
-		cl.def_readwrite("direction", &genesis::utils::SvgColorBarSettings::direction);
-		cl.def_readwrite("width", &genesis::utils::SvgColorBarSettings::width);
-		cl.def_readwrite("height", &genesis::utils::SvgColorBarSettings::height);
-		cl.def_readwrite("with_tickmarks", &genesis::utils::SvgColorBarSettings::with_tickmarks);
-		cl.def_readwrite("with_labels", &genesis::utils::SvgColorBarSettings::with_labels);
-		cl.def_readwrite("num_ticks", &genesis::utils::SvgColorBarSettings::num_ticks);
-		cl.def_readwrite("text_size", &genesis::utils::SvgColorBarSettings::text_size);
 	}
 }
