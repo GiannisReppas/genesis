@@ -17,9 +17,9 @@ genesis/utils/containers/range.cpp
 genesis/utils/containers/matrix.cpp
 genesis/utils/containers/matrix_1.cpp
 genesis/utils/containers/matrix_2.cpp
-genesis/utils/core/std.cpp
+genesis/utils/tools/char_lookup.cpp
+genesis/utils/core/logging.cpp
 genesis/utils/core/fs.cpp
-genesis/utils/io/base_input_source.cpp
 genesis/utils/io/input_source.cpp
 genesis/utils/text/string.cpp
 genesis/utils/text/string_1.cpp

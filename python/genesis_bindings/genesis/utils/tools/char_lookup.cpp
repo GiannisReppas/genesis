@@ -1,8 +1,9 @@
-#include <genesis/utils/core/fs.hpp>
+#include <functional>
 #include <genesis/utils/core/logging.hpp>
 #include <genesis/utils/core/std.hpp>
 #include <genesis/utils/io/gzip_block_ostream.hpp>
 #include <genesis/utils/io/gzip_stream.hpp>
+#include <genesis/utils/tools/char_lookup.hpp>
 #include <ios>
 #include <iterator>
 #include <locale>
@@ -44,8 +45,27 @@
 	PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 #endif
 
-void bind_genesis_utils_core_std(std::function< pybind11::module &(std::string const &namespace_) > &M)
+void bind_genesis_utils_tools_char_lookup(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	{ // genesis::utils::CharLookup file:genesis/utils/tools/char_lookup.hpp line:54
+		pybind11::class_<genesis::utils::CharLookup<unsigned long>, std::shared_ptr<genesis::utils::CharLookup<unsigned long>>> cl(M("genesis::utils"), "CharLookup_unsigned_long_t", "");
+		cl.def( pybind11::init( [](){ return new genesis::utils::CharLookup<unsigned long>(); } ) );
+		cl.def( pybind11::init<const unsigned long &>(), pybind11::arg("init_all") );
+
+		cl.def( pybind11::init( [](genesis::utils::CharLookup<unsigned long> const &o){ return new genesis::utils::CharLookup<unsigned long>(o); } ) );
+		cl.def("assign", (class genesis::utils::CharLookup<unsigned long> & (genesis::utils::CharLookup<unsigned long>::*)(const class genesis::utils::CharLookup<unsigned long> &)) &genesis::utils::CharLookup<unsigned long>::operator=, "C++: genesis::utils::CharLookup<unsigned long>::operator=(const class genesis::utils::CharLookup<unsigned long> &) --> class genesis::utils::CharLookup<unsigned long> &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
+		cl.def("set_char", (void (genesis::utils::CharLookup<unsigned long>::*)(char, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_char, "C++: genesis::utils::CharLookup<unsigned long>::set_char(char, unsigned long) --> void", pybind11::arg("c"), pybind11::arg("value"));
+		cl.def("set_char_upper_lower", (void (genesis::utils::CharLookup<unsigned long>::*)(char, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_char_upper_lower, "C++: genesis::utils::CharLookup<unsigned long>::set_char_upper_lower(char, unsigned long) --> void", pybind11::arg("c"), pybind11::arg("value"));
+		cl.def("set_if", (void (genesis::utils::CharLookup<unsigned long>::*)(class std::function<bool (char)>, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_if, "C++: genesis::utils::CharLookup<unsigned long>::set_if(class std::function<bool (char)>, unsigned long) --> void", pybind11::arg("predicate"), pybind11::arg("value"));
+		cl.def("set_selection", (void (genesis::utils::CharLookup<unsigned long>::*)(const std::string &, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_selection, "C++: genesis::utils::CharLookup<unsigned long>::set_selection(const std::string &, unsigned long) --> void", pybind11::arg("chars"), pybind11::arg("value"));
+		cl.def("set_selection_upper_lower", (void (genesis::utils::CharLookup<unsigned long>::*)(const std::string &, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_selection_upper_lower, "C++: genesis::utils::CharLookup<unsigned long>::set_selection_upper_lower(const std::string &, unsigned long) --> void", pybind11::arg("chars"), pybind11::arg("value"));
+		cl.def("set_range", (void (genesis::utils::CharLookup<unsigned long>::*)(char, char, unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_range, "C++: genesis::utils::CharLookup<unsigned long>::set_range(char, char, unsigned long) --> void", pybind11::arg("first"), pybind11::arg("last"), pybind11::arg("value"));
+		cl.def("set_all", (void (genesis::utils::CharLookup<unsigned long>::*)(unsigned long)) &genesis::utils::CharLookup<unsigned long>::set_all, "C++: genesis::utils::CharLookup<unsigned long>::set_all(unsigned long) --> void", pybind11::arg("value"));
+		cl.def("__getitem__", (unsigned long (genesis::utils::CharLookup<unsigned long>::*)(char) const) &genesis::utils::CharLookup<unsigned long>::operator[], "C++: genesis::utils::CharLookup<unsigned long>::operator[](char) const --> unsigned long", pybind11::arg("c"));
+		cl.def("get", (unsigned long (genesis::utils::CharLookup<unsigned long>::*)(char) const) &genesis::utils::CharLookup<unsigned long>::get, "C++: genesis::utils::CharLookup<unsigned long>::get(char) const --> unsigned long", pybind11::arg("c"));
+		cl.def("get_chars_equal_to", (std::string (genesis::utils::CharLookup<unsigned long>::*)(unsigned long) const) &genesis::utils::CharLookup<unsigned long>::get_chars_equal_to, "C++: genesis::utils::CharLookup<unsigned long>::get_chars_equal_to(unsigned long) const --> std::string", pybind11::arg("comp_value"));
+		cl.def("all_equal_to", (bool (genesis::utils::CharLookup<unsigned long>::*)(unsigned long) const) &genesis::utils::CharLookup<unsigned long>::all_equal_to, "C++: genesis::utils::CharLookup<unsigned long>::all_equal_to(unsigned long) const --> bool", pybind11::arg("comp_value"));
+	}
 	// genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) file:genesis/utils/core/std.hpp line:82
 	M("genesis::utils").def("make_unique", (class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> > (*)(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &)) &genesis::utils::make_unique<genesis::utils::GzipBlockOStream,std::ostream &, unsigned long &, genesis::utils::GzipCompressionLevel &, unsigned long &>, "C++: genesis::utils::make_unique(std::ostream &, unsigned long &, enum genesis::utils::GzipCompressionLevel &, unsigned long &) --> class std::unique_ptr<class genesis::utils::GzipBlockOStream, struct std::default_delete<class genesis::utils::GzipBlockOStream> >", pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"), pybind11::arg("args"));
 
@@ -120,21 +140,4 @@ void bind_genesis_utils_core_std(std::function< pybind11::module &(std::string c
 		cl.def_static("log_debug_3", (void (*)(const std::string &)) &genesis::utils::Logging::log_debug_3, "C++: genesis::utils::Logging::log_debug_3(const std::string &) --> void", pybind11::arg("msg"));
 		cl.def_static("log_debug_4", (void (*)(const std::string &)) &genesis::utils::Logging::log_debug_4, "C++: genesis::utils::Logging::log_debug_4(const std::string &) --> void", pybind11::arg("msg"));
 	}
-	{ // genesis::utils::LoggingScopeLevel file:genesis/utils/core/logging.hpp line:621
-		pybind11::class_<genesis::utils::LoggingScopeLevel, std::shared_ptr<genesis::utils::LoggingScopeLevel>> cl(M("genesis::utils"), "LoggingScopeLevel", "Class that sets the Logging Level to a value von construction and set it back on\n destruction. This is used by the log scope level macro.");
-		cl.def( pybind11::init<enum genesis::utils::Logging::LoggingLevel>(), pybind11::arg("scope_level") );
-
-	}
-	// genesis::utils::path_exists(const std::string &) file:genesis/utils/core/fs.hpp line:48
-	M("genesis::utils").def("path_exists", (bool (*)(const std::string &)) &genesis::utils::path_exists, "Return whether a path exists, i.e., is a file or directory.\n\nC++: genesis::utils::path_exists(const std::string &) --> bool", pybind11::arg("path"));
-
-	// genesis::utils::is_file(const std::string &) file:genesis/utils/core/fs.hpp line:57
-	M("genesis::utils").def("is_file", (bool (*)(const std::string &)) &genesis::utils::is_file, "Return true iff the provided path is a (readable) file.\n\n Internally, this function simply returns the value of file_is_readable(), meaning that we also\n check that the file can actually be read. That is semantically a bit different from just stating\n that it is a file... But file system stuff in C++ pre-17 is hard, and this works for now.\n\nC++: genesis::utils::is_file(const std::string &) --> bool", pybind11::arg("path"));
-
-	// genesis::utils::file_exists(const std::string &) file:genesis/utils/core/fs.hpp line:64
-	M("genesis::utils").def("file_exists", (bool (*)(const std::string &)) &genesis::utils::file_exists, "Return true iff the file exists (and is in fact a file, and not, e.g., a directory).\n\n  is_file( std::string const& )\n\nC++: genesis::utils::file_exists(const std::string &) --> bool", pybind11::arg("filename"));
-
-	// genesis::utils::file_is_readable(const std::string &) file:genesis/utils/core/fs.hpp line:75
-	M("genesis::utils").def("file_is_readable", (bool (*)(const std::string &)) &genesis::utils::file_is_readable, "Return whether a file is readable.\n\n For this, the file has to exist, and be accessible.\n Another potential error is that too many files are opened already.\n\n See file_is_readable( std::string const&, std::string& ) for a version of the function that also\n allows to retrieve the error message in cases where the result is `false`.\n\nC++: genesis::utils::file_is_readable(const std::string &) --> bool", pybind11::arg("filename"));
-
 }

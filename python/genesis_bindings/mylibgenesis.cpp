@@ -27,9 +27,9 @@ void bind_genesis_utils_containers_range(std::function< pybind11::module &(std::
 void bind_genesis_utils_containers_matrix(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_matrix_1(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_containers_matrix_2(std::function< pybind11::module &(std::string const &namespace_) > &M);
-void bind_genesis_utils_core_std(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_tools_char_lookup(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_genesis_utils_core_logging(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_core_fs(std::function< pybind11::module &(std::string const &namespace_) > &M);
-void bind_genesis_utils_io_base_input_source(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_io_input_source(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_text_string(std::function< pybind11::module &(std::string const &namespace_) > &M);
 void bind_genesis_utils_text_string_1(std::function< pybind11::module &(std::string const &namespace_) > &M);
@@ -174,9 +174,9 @@ PYBIND11_MODULE(mylibgenesis, root_module) {
 	bind_genesis_utils_containers_matrix(M);
 	bind_genesis_utils_containers_matrix_1(M);
 	bind_genesis_utils_containers_matrix_2(M);
-	bind_genesis_utils_core_std(M);
+	bind_genesis_utils_tools_char_lookup(M);
+	bind_genesis_utils_core_logging(M);
 	bind_genesis_utils_core_fs(M);
-	bind_genesis_utils_io_base_input_source(M);
 	bind_genesis_utils_io_input_source(M);
 	bind_genesis_utils_text_string(M);
 	bind_genesis_utils_text_string_1(M);
