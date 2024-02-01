@@ -14,12 +14,8 @@ class LabelsTest(unittest.TestCase):
 		sset = SequenceSet()
 		FastaReader().read( from_file(infile), sset)
 
-		# FILTER_BY_LABEL_LIST-1
-		if 10 != sset.size():
-			print("Error at FILTER_BY_LABEL_LIST-1")
-		# FILTER_BY_LABEL_LIST-2
-		if 4600 != total_length( sset ):
-			print("Error at FILTER_BY_LABEL_LIST-2")
+		self.assertEqual( 10, sset.size())
+		self.assertEqual( 4600, total_length( sset ))
 
 		good_labels = {
 		    "Di106BGTue",
@@ -38,62 +34,47 @@ class LabelsTest(unittest.TestCase):
 		}
 
 		filter_by_label_list( sset, bad_labels )
-		# FILTER_BY_LABEL_LIST-1
-		if 7 != sset.size():
-			print("Error at FILTER_BY_LABEL_LIST-1")
-		# FILTER_BY_LABEL_LIST-2
-		if good_labels != labels( sset ):
-			print("Error at FILTER_BY_LABEL_LIST-2")
+		self.assertEqual( 7, sset.size())
+		self.assertEqual( good_labels, labels( sset ))
 
-		filter_by_label_list( sset, good_labels );
-		# FILTER_BY_LABEL_LIST-3
-		if 0 != sset.size():
-			print("Error at FILTER_BY_LABEL_LIST-3")
-		# FILTER_BY_LABEL_LIST-4
-		if not sset.empty():
-			print("Error at FILTER_BY_LABEL_LIST-4")
+		filter_by_label_list( sset, good_labels )
+		self.assertEqual( 0, sset.size())
+		self.assertTrue( sset.empty())
 
 	def test_guess_abundances(self):
 		good = ( "abc", 123 )
 
-		# GUESS_ABUNDANCES-1
-		if good != guess_sequence_abundance( "abc_123" ):
-			print("Error at GUESS_ABUNDANCES-1")
-		# GUESS_ABUNDANCES-2
-		if good != guess_sequence_abundance( "abc;size=123;" ):
-			print("Error at GUESS_ABUNDANCES-2")
-		# GUESS_ABUNDANCES-3
-		if good != guess_sequence_abundance( "abc;size=123" ):
-			print("Error at GUESS_ABUNDANCES-3")
-		# GUESS_ABUNDANCES-4
-		if good != guess_sequence_abundance( "abc;key=value;size=123;foo=bar;" ):
-			print("Error at GUESS_ABUNDANCES-4")
+		self.assertEqual( good, guess_sequence_abundance( "abc_123" ))
+		self.assertEqual( good, guess_sequence_abundance( "abc;size=123;" ))
+		self.assertEqual( good, guess_sequence_abundance( "abc;size=123" ))
+		self.assertEqual( good, guess_sequence_abundance( "abc;key=value;size=123;foo=bar;" ))
 
-		# GUESS_ABUNDANCES-5
-		if ( "abc_size=123_", np.size(1) ) != guess_sequence_abundance( "abc_size=123_" ):
-			print("Error at GUESS_ABUNDANCES-5")
-		# GUESS_ABUNDANCES-6
-		if ( "abcsize=123", np.size(1) ) != guess_sequence_abundance( "abcsize=123" ):
-			print("Error at GUESS_ABUNDANCES-6")
-		# GUESS_ABUNDANCES-7
-		if ( "abc", np.size(1) ) != guess_sequence_abundance( "abc;size=123x" ):
-			print("Error at GUESS_ABUNDANCES-7")
+		self.assertEqual( ( "abc_size=123_", np.size(1) ), guess_sequence_abundance( "abc_size=123_" ))
+		self.assertEqual( ( "abcsize=123", np.size(1) ), guess_sequence_abundance( "abcsize=123" ))
+		self.assertEqual( ( "abc", np.size(1) ), guess_sequence_abundance( "abc;size=123x" ))
 
-		# GUESS_ABUNDANCES-8
-		if ( "abc_",       np.size(1) ) != guess_sequence_abundance( "abc_" ):
-			print("Error at GUESS_ABUNDANCES-8")
-		# GUESS_ABUNDANCES-9
-		if ( "abc;size=",  np.size(1) ) != guess_sequence_abundance( "abc;size=" ):
-			print("Error at GUESS_ABUNDANCES-9")
-		# GUESS_ABUNDANCES-10
-		if ( "abc_123x",   np.size(1) ) != guess_sequence_abundance( "abc_123x" ):
-			print("Error at GUESS_ABUNDANCES-10")
-		# GUESS_ABUNDANCES-11
-		if ( "abc_x",      np.size(1) ) != guess_sequence_abundance( "abc_x" ):
-			print("Error at GUESS_ABUNDANCES-11")
-		# GUESS_ABUNDANCES-12
-		if ( "abc", np.size(1) ) != guess_sequence_abundance( "abc;size=x" ):
-			print("Error at GUESS_ABUNDANCES-12")
+		self.assertEqual( ( "abc_",       np.size(1) ), guess_sequence_abundance( "abc_" ))
+		self.assertEqual( ( "abc;size=",  np.size(1) ), guess_sequence_abundance( "abc;size=" ))
+		self.assertEqual( ( "abc_123x",   np.size(1) ), guess_sequence_abundance( "abc_123x" ))
+		self.assertEqual( ( "abc_x",      np.size(1) ), guess_sequence_abundance( "abc_x" ))
+		self.assertEqual( ( "abc", np.size(1) ), guess_sequence_abundance( "abc;size=x" ))
+
+	def test_label_attributes(self):
+		exp1 = LabelAttributes()
+		exp1.label = "bla"
+		exp1.attributes = { "size":"123", "weight": "100" }
+		act1 = label_attributes( "bla;size=123;weight=100;" )
+		self.assertEqual( exp1.label, act1.label )
+		self.assertEqual( exp1.attributes, act1.attributes )
+
+		exp2 =LabelAttributes()
+		exp2.label = "bla"
+		exp2.attributes = {}
+		act2 = label_attributes( "bla;" )
+		self.assertEqual( exp2.label, act2.label )
+		self.assertEqual( exp2.attributes, act2.attributes )
+
+		self.assertRaises( RuntimeError, label_attributes, "bla;foo")
 
 if __name__ == '__main__':
     unittest.main()

@@ -20,22 +20,25 @@
 #include <pybind11/pybind11.h>
 #include <string>
 #include <pybind11/functional.h>
-#include <../python/custom_bindings/extensions/matrix.hpp>
+#include <../python/custom_bindings/extensions/utils/matrix.hpp>
 #include <genesis/utils/color/functions.hpp>
-#include <../python/custom_bindings/extensions/bitvector.hpp>
-#include <../python/custom_bindings/extensions/range.hpp>
-#include <../python/custom_bindings/extensions/quality.hpp>
-#include <../python/custom_bindings/extensions/sequence_set.hpp>
-#include <../python/custom_bindings/extensions/sequence_dict.hpp>
-#include <../python/custom_bindings/extensions/fasta_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/fastq_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/fasta_output_iterator.hpp>
-#include <../python/custom_bindings/extensions/taxopath.hpp>
-#include <../python/custom_bindings/extensions/functions_taxonomy.hpp>
-#include <../python/custom_bindings/extensions/tree.hpp>
-#include <../python/custom_bindings/extensions/functions_tree.hpp>
+#include <../python/custom_bindings/extensions/utils/bitvector.hpp>
+#include <../python/custom_bindings/extensions/utils/range.hpp>
+#include <../python/custom_bindings/extensions/to_string.hpp>
+#include <../python/custom_bindings/extensions/sequence/quality.hpp>
+#include <../python/custom_bindings/extensions/sequence/sequence_set.hpp>
+#include <../python/custom_bindings/extensions/sequence/sequence_dict.hpp>
+#include <../python/custom_bindings/extensions/sequence/fasta_input_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/fastq_input_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
+#include <../python/custom_bindings/extensions/tree/tree.hpp>
+#include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
-#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
+#include <../python/custom_bindings/extensions/population/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -92,9 +95,6 @@ void bind_genesis_utils_io_gzip_output_target(std::function< pybind11::module &(
 	// genesis::utils::to_stream(std::ostream &, enum genesis::utils::GzipCompressionLevel) file:genesis/utils/io/output_target.hpp line:176
 	M("genesis::utils").def("to_stream", [](std::ostream & a0) -> std::shared_ptr<class genesis::utils::BaseOutputTarget> { return genesis::utils::to_stream(a0); }, "", pybind11::arg("target_stream"));
 	M("genesis::utils").def("to_stream", (class std::shared_ptr<class genesis::utils::BaseOutputTarget> (*)(std::ostream &, enum genesis::utils::GzipCompressionLevel)) &genesis::utils::to_stream, "Obtain an output target for writing to a stream.\n\n The output target returned from this function can be used in the writer classes, e.g.,\n placement::JplaceWriter or sequence::FastaWriter.\n\n If  is set to a compression level other than ::GzipCompressionLevel::kNoCompression\n (which is the default, which means, no compression by default), the output is compressed using\n gzip. In that case, it is recommended that the  uses `std::ios_base::binary`\n when opening the stream.\n\nC++: genesis::utils::to_stream(std::ostream &, enum genesis::utils::GzipCompressionLevel) --> class std::shared_ptr<class genesis::utils::BaseOutputTarget>", pybind11::arg("target_stream"), pybind11::arg("compression_level"));
-
-	// genesis::utils::to_string(std::string &) file:genesis/utils/io/output_target.hpp line:195
-	M("genesis::utils").def("to_string", (class std::shared_ptr<class genesis::utils::BaseOutputTarget> (*)(std::string &)) &genesis::utils::to_string, "Obtain an output target for writing to a string.\n\n The output target returned from this function can be used in the writer classes, e.g.,\n placement::JplaceWriter or sequence::FastaWriter.\n\nC++: genesis::utils::to_string(std::string &) --> class std::shared_ptr<class genesis::utils::BaseOutputTarget>", pybind11::arg("target_string"));
 
 	// genesis::utils::circumference(double) file:genesis/utils/math/common.hpp line:57
 	M("genesis::utils").def("circumference", (double (*)(double)) &genesis::utils::circumference, "C++: genesis::utils::circumference(double) --> double", pybind11::arg("radius"));

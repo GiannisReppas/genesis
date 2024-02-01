@@ -185,7 +185,7 @@ option (GENESIS_BUILD_APPLICATIONS  "Build Genesis applications." ${GENESIS_IS_M
 
 # Currently, the Python module and tests are deactivated by default.
 option (GENESIS_BUILD_PYTHON_MODULE "Build the Genesis python module."                   OFF)
-option (GENESIS_BUILD_TESTS         "Build the Genesis test suites."                     OFF)
+option (GENESIS_BUILD_TESTS         "Build the Genesis test suites."                     ON)
 
 # If available, use external dependencies.
 option (GENESIS_USE_ZLIB            "Use zlib."                                          ON)

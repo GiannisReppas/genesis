@@ -15,42 +15,27 @@ class CodesTest(unittest.TestCase):
 		for code in codes:
 			code_string = nucleic_acid_ambiguities( code )
 			code_char   = nucleic_acid_ambiguity_code( code_string )
-			if code != code_char:
-				print("Error at CODE_AMBIGUITIES-1")
+			self.assertEqual( code, code_char)
 
 	def test_code_containment(self):
-		if not nucleic_acid_code_containment( 'A', 'A' ):
-			print("Error at CODE_CONTAINMENT-1")
-		if not nucleic_acid_code_containment( 'C', 'C' ):
-			print("Error at CODE_CONTAINMENT-2")
-		if not nucleic_acid_code_containment( 'G', 'G' ):
-			print("Error at CODE_CONTAINMENT-3")
-		if not nucleic_acid_code_containment( 'T', 'T' ):
-			print("Error at CODE_CONTAINMENT-4")
+		self.assertTrue( nucleic_acid_code_containment( 'A', 'A' ) )
+		self.assertTrue( nucleic_acid_code_containment( 'C', 'C' ) )
+		self.assertTrue( nucleic_acid_code_containment( 'G', 'G' ) )
+		self.assertTrue( nucleic_acid_code_containment( 'T', 'T' ) )
 
-		if not nucleic_acid_code_containment( 'A', 'W' ):
-			print("Error at CODE_CONTAINMENT-5")
-		if not nucleic_acid_code_containment( 'T', 'W' ):
-			print("Error at CODE_CONTAINMENT-6")
-		if not nucleic_acid_code_containment( 'C', 'H' ):
-			print("Error at CODE_CONTAINMENT-7")
+		self.assertTrue( nucleic_acid_code_containment( 'A', 'W' ) )
+		self.assertTrue( nucleic_acid_code_containment( 'T', 'W' ) )
+		self.assertTrue( nucleic_acid_code_containment( 'C', 'H' ) )
 
-		if nucleic_acid_code_containment( 'C', 'D' ):
-			print("Error at CODE_CONTAINMENT-8")
-		if nucleic_acid_code_containment( 'A', 'T' ):
-			print("Error at CODE_CONTAINMENT-9")
-		if nucleic_acid_code_containment( 'A', 'Y' ):
-			print("Error at CODE_CONTAINMENT-10")
+		self.assertFalse( nucleic_acid_code_containment( 'C', 'D' ) )
+		self.assertFalse( nucleic_acid_code_containment( 'A', 'T' ) )
+		self.assertFalse( nucleic_acid_code_containment( 'A', 'Y' ) )
 
-		if not nucleic_acid_code_containment( '-', 'C', True ):
-			print("Error at CODE_CONTAINMENT-11")
-		if not nucleic_acid_code_containment( '-', 'H', True ):
-			print("Error at CODE_CONTAINMENT-12")
+		self.assertTrue( nucleic_acid_code_containment( '-', 'C', True ) )
+		self.assertTrue( nucleic_acid_code_containment( '-', 'H', True ) )
 
-		if nucleic_acid_code_containment( '-', 'C', False ):
-			print("Error at CODE_CONTAINMENT-13")
-		if nucleic_acid_code_containment( '-', 'H', False ):
-			print("Error at CODE_CONTAINMENT-14")
+		self.assertFalse( nucleic_acid_code_containment( '-', 'C', False ) )
+		self.assertFalse( nucleic_acid_code_containment( '-', 'H', False ) )
 
 
 if __name__ == '__main__':

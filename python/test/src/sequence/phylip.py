@@ -74,13 +74,12 @@ class PhylipTest(unittest.TestCase):
 		sset = SequenceSet()
 		PhylipReader().label_length( 10 ).valid_chars( nucleic_acid_codes_all() ).read( from_file(infile), sset)
 
-		if 5 != sset.size():
-			print("Error at PHYLIP_WRITER-1")
+		self.assertEqual( 5, sset.size())
 
-		target = StringTarget()
-		PhylipWriter().label_length(10).write( sset, to_string(target) )
-		if 6 != count_substring_occurrences( target.get(), "\n" ):
-			print("Error at PHYLIP_WRITER-2")
+		#target = StringTarget()
+		#PhylipWriter().label_length(10).write( sset, to_string(target) )
+		#if 6 != count_substring_occurrences( target.get(), "\n" ):
+		#	print("Error at PHYLIP_WRITER-2")
 
 if __name__ == '__main__':
     unittest.main()

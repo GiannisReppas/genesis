@@ -12,12 +12,9 @@ class SignaturesTest(unittest.TestCase):
 		for k in range(1,6):
 			my_list = SignatureSpecifications( "ACGT", k ).kmer_list()
 
-			# KMER_LIST-1
 			self.assertEqual( int_pow( 4, k ) , len(my_list) )
-			# KMER_LIST-2
 			temp = "A" * k
 			self.assertEqual( temp , my_list[0] )
-			# KHMER_LIST-3
 			temp = "T" * k
 			self.assertEqual( temp , my_list[len(my_list)-1] )
 
@@ -28,7 +25,6 @@ class SignaturesTest(unittest.TestCase):
 
 		remove_all_gaps( sset )
 
-		#KMER_COUNTS-1
 		self.assertTrue( validate_chars( sset, nucleic_acid_codes_plain() ) )
 
 		alphabet = "ACGT"
@@ -39,25 +35,21 @@ class SignaturesTest(unittest.TestCase):
 
 			for seq in sset:
 				kmers = signature_counts( seq, settings )
-				# KMER_COUNTS-2
 				self.assertEqual( len(my_list) , len(kmers) )
 
 				for i in range(0,len(kmers)):
 					count = count_substring_occurrences( seq.sites(), my_list[i] )
-					# KMER_COUNTS-3
 					self.assertEqual( count , kmers[i] )
 
 				sum = 0
 				for i in range(0,len(kmers)):
 					sum += kmers[i]
-				# KMER_COUNTS-4
 				self.assertEqual( (seq.size() - k + 1) , sum )
 
 				sym_kmers = signature_symmetrized_counts( seq, settings )
 				sum = 0
 				for i in range(0,len(sym_kmers)):
 					sum += sym_kmers[i]
-				# KMER_COUNTS-5
 				self.assertEqual( (seq.size() - k + 1) , sum )
 
 	def test_signature_frequencies(self):
@@ -65,7 +57,6 @@ class SignaturesTest(unittest.TestCase):
 		sset = SequenceSet();
 		FastaReader().read( from_file(infile), sset);
 
-		# SIGNATURE_FREQUENCIES-1
 		remove_all_gaps( sset );
 		self.assertTrue( validate_chars( sset, nucleic_acid_codes_plain() ) )
 
@@ -73,14 +64,12 @@ class SignaturesTest(unittest.TestCase):
 			settings = SignatureSpecifications( "ACGT", k )
 
 			for seq in sset:
-				# SIGNATURE_FREQUENCIES-1
 				freqs = signature_frequencies( seq, settings )
 				sum = 0.0
 				for i in range(0,len(freqs)):
 					sum += freqs[i]
 				self.assertEqual( 1.0 , round(sum) )
 
-				# SIGNATURE_FREQUENCIES-2
 				sym_freqs = signature_symmetrized_frequencies( seq, settings );
 				sym_sum = 0.0
 				for i in range(0,len(sym_freqs)):
@@ -92,7 +81,6 @@ class SignaturesTest(unittest.TestCase):
 			settings = SignatureSpecifications( "ACGT", k )
 			my_list = settings.kmer_list()
 			rc_map = settings.kmer_combined_reverse_complement_map()
-			# KMER_REVERSE_COMPLEMENTS-1
 			self.assertEqual( len(my_list) , len(rc_map) )
 
 			revcom_size = settings.kmer_reverse_complement_list_size()
@@ -100,22 +88,18 @@ class SignaturesTest(unittest.TestCase):
 			for i in range(0,len(my_list)):
 				rev = reverse_complement( my_list[i] )
 
-				# KMER_REVERSE_COMPLEMENTS-2
 				self.assertEqual( my_list[i] , reverse_complement(rev) )
 
 				for j in range(0,len(my_list)):
 					if my_list[j] == rev:
 						break;
 
-				# KMER_REVERSE_COMPLEMENTS-3
 				if j >= len(my_list):
 					print("Error at KMER_REVERSE_COMPLEMENTS-3")
 
-				# KMER_REVERSE_COMPLEMENTS-4
 				if rc_map[i] != rc_map[j]:
 					print("Error at KMER_REVERSE_COMPLEMENTS-4")
 
-				# KMER_REVERSE_COMPLEMENTS-5
 				if rc_map[i] >= revcom_size:
 					print("Error at KMER_REVERSE_COMPLEMENTS-5")
 
@@ -128,20 +112,16 @@ class SignaturesTest(unittest.TestCase):
 				for j in range(0,len(rc_list)):
 					if rc_list[j] == rev:
 						break;
-				# KMMER_REVERSE_COMPLEMENTS-6
 				if rc_list[j] != rc_list[len(rc_list)-1]:
 					print("Error at KMER_REVERSE_COMPLEMENTS-6")
 
 			rc_ids = settings.kmer_reverse_complement_indices()
-			# KMER_REVERSE_COMPLEMENTS-7
 			if len(rc_ids) != len(my_list):
 				print("Error at KMER_REVERSE_COMPLEMENTS-7")
 			for i in range(0,len(my_list)):
-				# KMER_REVERSE_COMPLEMENTS-8
 				if i != rc_ids[ rc_ids[i] ]:
 					print("Error at KMER_REVERSE_COMPLEMENTS-8")
 				rev = reverse_complement( my_list[i] )
-				# KMER_REVERSE_COMPLEMENTS-9
 				if rev != my_list[ rc_ids[i] ]:
 					print("Error at KMER_REVERSE_COMPLEMENTS-9")
 
@@ -163,9 +143,27 @@ class SignaturesTest(unittest.TestCase):
 		short_seq = Sequence( "label", "ACGT" )
 		short_set = SignatureSpecifications( "ACGT", 5 );
 		short_str  = kmer_string_overlapping( short_seq, short_set );
-		# KMER_STRING_OVERLAPPING-2
 		if short_str != "":
 			print("Error at KMER_STRING_OVERLAPPING-2")
 
+	def test_kmer_string_non_overlapping(self):
+		seq = Sequence( "label", "AAAACCCCGGGGTTTT" )
+		expected = [ ["A A A A C C C C G G G G T T T T"], ["AA AA CC CC GG GG TT TT","AA AC CC CG GG GT TT"], ["AAA ACC CCG GGG TTT","AAA CCC CGG GGT TTT","AAC CCC GGG GTT"], ["AAAA CCCC GGGG TTTT","AAAC CCCG GGGT","AACC CCGG GGTT","ACCC CGGG GTTT"], ["AAAAC CCCGG GGTTT","AAACC CCGGG GTTTT","AACCC CGGGG","ACCCC GGGGT","CCCCG GGGTT"]]
+		for k in range(1,6):
+			settings = SignatureSpecifications( "ACGT", k )
+			kmervec  = kmer_strings_non_overlapping( seq, settings )
+			self.assertEqual( kmervec, expected[k-1] )
+
+			# std::cout << seq.sites() << " with k " << k << "\n";
+			# kmer_strings_non_overlapping( seq, settings, std::cout );
+			# std::cout << "\n";
+
+		# Test edge case.
+		short_seq = Sequence( "label", "ACGT" )
+		short_set = SignatureSpecifications( "ACGT", 5 )
+		# kmer_strings_non_overlapping( short_seq, short_set, std::cout );
+		short_str  = kmer_strings_non_overlapping( short_seq, short_set )
+		self.assertEqual( short_str, [] )
+
 if __name__ == '__main__':
-    unittest.main()
+	unittest.main()

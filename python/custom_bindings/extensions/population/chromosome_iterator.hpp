@@ -12,13 +12,6 @@ template<class T>
 inline void extend_chromosome_iterator( T& cl )
 {
 	cl.def(
-		"boop",
-		[]()
-		{
-		}
-	);
-
-	cl.def(
 		"__iter__",
 
 		[](ChromosomeIterator< genesis::utils::LambdaIterator<genesis::population::Variant, genesis::population::VariantInputIteratorData>::Iterator>& self)

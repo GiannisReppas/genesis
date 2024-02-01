@@ -87,9 +87,16 @@ def compile_sources(sources_to_compile):
     # Done making CMakeLists.txt
     cmake_script_path = pathlib.Path().resolve()
     os.chdir(bindings_dir)
+
+    # fast, a lot of memory
     cmake_command = 'cmake ' + str(cmake_script_path) + ' -G Ninja'
     subprocess.call(cmake_command.split())
     subprocess.call('ninja')
+
+    # very slow, less memory
+    #cmake_command = 'cmake ' + str(cmake_script_path)
+    #subprocess.call(cmake_command.split())
+    #subprocess.call('make')
 
 
 def main():

@@ -19,22 +19,25 @@
 #include <pybind11/pybind11.h>
 #include <string>
 #include <pybind11/functional.h>
-#include <../python/custom_bindings/extensions/matrix.hpp>
+#include <../python/custom_bindings/extensions/utils/matrix.hpp>
 #include <genesis/utils/color/functions.hpp>
-#include <../python/custom_bindings/extensions/bitvector.hpp>
-#include <../python/custom_bindings/extensions/range.hpp>
-#include <../python/custom_bindings/extensions/quality.hpp>
-#include <../python/custom_bindings/extensions/sequence_set.hpp>
-#include <../python/custom_bindings/extensions/sequence_dict.hpp>
-#include <../python/custom_bindings/extensions/fasta_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/fastq_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/fasta_output_iterator.hpp>
-#include <../python/custom_bindings/extensions/taxopath.hpp>
-#include <../python/custom_bindings/extensions/functions_taxonomy.hpp>
-#include <../python/custom_bindings/extensions/tree.hpp>
-#include <../python/custom_bindings/extensions/functions_tree.hpp>
+#include <../python/custom_bindings/extensions/utils/bitvector.hpp>
+#include <../python/custom_bindings/extensions/utils/range.hpp>
+#include <../python/custom_bindings/extensions/to_string.hpp>
+#include <../python/custom_bindings/extensions/sequence/quality.hpp>
+#include <../python/custom_bindings/extensions/sequence/sequence_set.hpp>
+#include <../python/custom_bindings/extensions/sequence/sequence_dict.hpp>
+#include <../python/custom_bindings/extensions/sequence/fasta_input_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/fastq_input_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
+#include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
+#include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
+#include <../python/custom_bindings/extensions/tree/tree.hpp>
+#include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
 #include <genesis/population/genome_region_list.hpp>
-#include <../python/custom_bindings/extensions/chromosome_iterator.hpp>
+#include <../python/custom_bindings/extensions/population/chromosome_iterator.hpp>
 #include <pybind11/stl.h>
 
 
@@ -48,7 +51,7 @@
 void bind_genesis_taxonomy_formats_taxopath_parser(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
 
-	extend_functions_taxonomy(M("genesis::taxonomy"));
+	extend_iterator(M("genesis::taxonomy"));
 	{ // genesis::taxonomy::TaxopathParser file:genesis/taxonomy/formats/taxopath_parser.hpp line:81
 		pybind11::class_<genesis::taxonomy::TaxopathParser, std::shared_ptr<genesis::taxonomy::TaxopathParser>> cl(M("genesis::taxonomy"), "TaxopathParser", "Helper class to parse a string containing a taxonomic path string into a Taxopath object.\n\n This class bundles the parameters used for parsing a taxonomic path strings and offers functions\n for the actual parsing. This is needed in order to allow customization of the parsing process,\n for example in TaxonomyReader. Furthermore, this prevents code duplication in places where the\n input is a taxonomic path string.\n The result of the parsing process is a Taxopath object. See there for details.\n\n The elements are expected to be char separated, using the value of\n \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		cl.def( pybind11::init( [](){ return new genesis::taxonomy::TaxopathParser(); } ) );
