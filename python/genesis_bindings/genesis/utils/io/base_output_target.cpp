@@ -35,7 +35,6 @@
 #include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
-#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
@@ -53,7 +52,7 @@
 
 void bind_genesis_utils_io_base_output_target(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
-	{ // genesis::utils::BaseOutputTarget file:genesis/utils/io/base_output_target.hpp line:61
+	{ // genesis::utils::BaseOutputTarget file:genesis/utils/io/base_output_target.hpp line:60
 		pybind11::class_<genesis::utils::BaseOutputTarget, std::shared_ptr<genesis::utils::BaseOutputTarget>> cl(M("genesis::utils"), "BaseOutputTarget", "Abstract base class for writing data to an output target.\n\n The class is an interface that allows writing to different targets, and adds a layer of abstraction\n around using simple `std::ostream` functionality. In particular, we want to add some checks,\n naming of the streams, etc. Internally however, the derived classes of this base class use\n `std::ostream`, and make it accessible.\n\n \n FileOutputTarget, GzipOutputTarget, StreamOutputTarget, StringOutputTarget for our derived\n output target classes.\n \n\n to_file(), to_gzip_block_file(), to_stream(), to_string() for helper functions to create\n these classes, to add some syntactic sugar and make it easy to use.");
 		cl.def("assign", (class genesis::utils::BaseOutputTarget & (genesis::utils::BaseOutputTarget::*)(const class genesis::utils::BaseOutputTarget &)) &genesis::utils::BaseOutputTarget::operator=, "C++: genesis::utils::BaseOutputTarget::operator=(const class genesis::utils::BaseOutputTarget &) --> class genesis::utils::BaseOutputTarget &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 		cl.def("ostream", (std::ostream & (genesis::utils::BaseOutputTarget::*)()) &genesis::utils::BaseOutputTarget::ostream, "Get the underlying output stream that is used for writing.\n\nC++: genesis::utils::BaseOutputTarget::ostream() --> std::ostream &", pybind11::return_value_policy::reference_internal);

@@ -51,7 +51,6 @@
 #include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
-#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>

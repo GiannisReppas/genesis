@@ -10,9 +10,9 @@ inline void extend_to_string(pybind11::module &handle)
 {
     handle.def(
         "to_string",
-        []( std::string& target_string) -> std::shared_ptr<::genesis::utils::StringOutputTarget>
+        []( StringTarget& target_string) -> std::shared_ptr<::genesis::utils::BaseOutputTarget>
         {
-            return std::make_shared< ::genesis::utils::StringOutputTarget >( target_string );
+            return std::make_shared< ::genesis::utils::StringOutputTarget >( target_string.get() );
         }
         , pybind11::return_value_policy::copy
     );

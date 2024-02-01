@@ -31,7 +31,6 @@
 #include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
-#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
@@ -49,6 +48,15 @@
 
 void bind_genesis_taxonomy_functions_taxonomy(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+	// genesis::taxonomy::taxa_count_lowest_levels(const class genesis::taxonomy::Taxonomy &) file:genesis/taxonomy/functions/taxonomy.hpp line:261
+	M("genesis::taxonomy").def("taxa_count_lowest_levels", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &)) &genesis::taxonomy::taxa_count_lowest_levels, "Return the number of lowest level \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_lowest_levels(const class genesis::taxonomy::Taxonomy &) --> unsigned long", pybind11::arg("tax"));
+
+	// genesis::taxonomy::taxa_count_at_level(const class genesis::taxonomy::Taxonomy &, unsigned long) file:genesis/taxonomy/functions/taxonomy.hpp line:274
+	M("genesis::taxonomy").def("taxa_count_at_level", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &, unsigned long)) &genesis::taxonomy::taxa_count_at_level, "Count the number of \n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_at_level(const class genesis::taxonomy::Taxonomy &, unsigned long) --> unsigned long", pybind11::arg("tax"), pybind11::arg("level"));
+
+	// genesis::taxonomy::taxa_count_levels(const class genesis::taxonomy::Taxonomy &) file:genesis/taxonomy/functions/taxonomy.hpp line:287
+	M("genesis::taxonomy").def("taxa_count_levels", (class std::vector<unsigned long, class std::allocator<unsigned long> > (*)(const class genesis::taxonomy::Taxonomy &)) &genesis::taxonomy::taxa_count_levels, "Count the number of \n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_levels(const class genesis::taxonomy::Taxonomy &) --> class std::vector<unsigned long, class std::allocator<unsigned long> >", pybind11::arg("tax"));
+
 	// genesis::taxonomy::taxa_count_with_rank(const class genesis::taxonomy::Taxonomy &, const std::string &, bool) file:genesis/taxonomy/functions/taxonomy.hpp line:299
 	M("genesis::taxonomy").def("taxa_count_with_rank", [](const class genesis::taxonomy::Taxonomy & a0, const std::string & a1) -> unsigned long { return genesis::taxonomy::taxa_count_with_rank(a0, a1); }, "", pybind11::arg("tax"), pybind11::arg("rank"));
 	M("genesis::taxonomy").def("taxa_count_with_rank", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &, const std::string &, bool)) &genesis::taxonomy::taxa_count_with_rank, "Count the number of \n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_with_rank(const class genesis::taxonomy::Taxonomy &, const std::string &, bool) --> unsigned long", pybind11::arg("tax"), pybind11::arg("rank"), pybind11::arg("case_sensitive"));

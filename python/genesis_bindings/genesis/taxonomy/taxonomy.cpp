@@ -10,7 +10,6 @@
 #include <sstream> // __str__
 #include <streambuf>
 #include <string>
-#include <vector>
 
 #include <functional>
 #include <pybind11/pybind11.h>
@@ -29,7 +28,6 @@
 #include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
-#include <../python/custom_bindings/extensions/taxonomy/functions_taxonomy.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
@@ -141,6 +139,12 @@ void bind_genesis_taxonomy_taxonomy(std::function< pybind11::module &(std::strin
 		pybind11::class_<genesis::taxonomy::BreadthFirstSearch, std::shared_ptr<genesis::taxonomy::BreadthFirstSearch>> cl(M("genesis::taxonomy"), "BreadthFirstSearch", "Tag used for find_taxon().");
 		cl.def( pybind11::init( [](){ return new genesis::taxonomy::BreadthFirstSearch(); } ) );
 	}
+	// genesis::taxonomy::find_taxon_by_name(const class genesis::taxonomy::Taxonomy &, const std::string &) file:genesis/taxonomy/functions/taxonomy.hpp line:151
+	M("genesis::taxonomy").def("find_taxon_by_name", (const class genesis::taxonomy::Taxon * (*)(const class genesis::taxonomy::Taxonomy &, const std::string &)) &genesis::taxonomy::find_taxon_by_name, "Alias for find_taxon_by_name(..., DepthFirstSearch{}).\n\nC++: genesis::taxonomy::find_taxon_by_name(const class genesis::taxonomy::Taxonomy &, const std::string &) --> const class genesis::taxonomy::Taxon *", pybind11::return_value_policy::reference_internal, pybind11::arg("tax"), pybind11::arg("name"));
+
+	// genesis::taxonomy::find_taxon_by_name(class genesis::taxonomy::Taxonomy &, const std::string &) file:genesis/taxonomy/functions/taxonomy.hpp line:156
+	M("genesis::taxonomy").def("find_taxon_by_name", (class genesis::taxonomy::Taxon * (*)(class genesis::taxonomy::Taxonomy &, const std::string &)) &genesis::taxonomy::find_taxon_by_name, "Alias for find_taxon_by_name(..., DepthFirstSearch{}).\n\nC++: genesis::taxonomy::find_taxon_by_name(class genesis::taxonomy::Taxonomy &, const std::string &) --> class genesis::taxonomy::Taxon *", pybind11::return_value_policy::reference_internal, pybind11::arg("tax"), pybind11::arg("name"));
+
 	// genesis::taxonomy::find_taxon_by_id(const class genesis::taxonomy::Taxonomy &, const std::string &) file:genesis/taxonomy/functions/taxonomy.hpp line:161
 	M("genesis::taxonomy").def("find_taxon_by_id", (const class genesis::taxonomy::Taxon * (*)(const class genesis::taxonomy::Taxonomy &, const std::string &)) &genesis::taxonomy::find_taxon_by_id, "Alias for find_taxon_by_id(..., DepthFirstSearch{}).\n\nC++: genesis::taxonomy::find_taxon_by_id(const class genesis::taxonomy::Taxonomy &, const std::string &) --> const class genesis::taxonomy::Taxon *", pybind11::return_value_policy::reference_internal, pybind11::arg("tax"), pybind11::arg("id"));
 
@@ -152,14 +156,5 @@ void bind_genesis_taxonomy_taxonomy(std::function< pybind11::module &(std::strin
 
 	// genesis::taxonomy::total_taxa_count(const class genesis::taxonomy::Taxonomy &) file:genesis/taxonomy/functions/taxonomy.hpp line:240
 	M("genesis::taxonomy").def("total_taxa_count", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &)) &genesis::taxonomy::total_taxa_count, "Return the total number of taxa contained in the Taxomony, i.e., the number of\n (non-unique) names of all children (recursively).\n\n Example: The Taxonomy\n\n     Tax_1\n         Tax_2\n             Tax_3\n         Tax_4\n             Tax_3\n     Tax_5\n\n contains a total of 6 taxa. The name `Tax_3` appears twice and is counted twice.\n\nC++: genesis::taxonomy::total_taxa_count(const class genesis::taxonomy::Taxonomy &) --> unsigned long", pybind11::arg("tax"));
-
-	// genesis::taxonomy::taxa_count_lowest_levels(const class genesis::taxonomy::Taxonomy &) file:genesis/taxonomy/functions/taxonomy.hpp line:261
-	M("genesis::taxonomy").def("taxa_count_lowest_levels", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &)) &genesis::taxonomy::taxa_count_lowest_levels, "Return the number of lowest level \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_lowest_levels(const class genesis::taxonomy::Taxonomy &) --> unsigned long", pybind11::arg("tax"));
-
-	// genesis::taxonomy::taxa_count_at_level(const class genesis::taxonomy::Taxonomy &, unsigned long) file:genesis/taxonomy/functions/taxonomy.hpp line:274
-	M("genesis::taxonomy").def("taxa_count_at_level", (unsigned long (*)(const class genesis::taxonomy::Taxonomy &, unsigned long)) &genesis::taxonomy::taxa_count_at_level, "Count the number of \n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_at_level(const class genesis::taxonomy::Taxonomy &, unsigned long) --> unsigned long", pybind11::arg("tax"), pybind11::arg("level"));
-
-	// genesis::taxonomy::taxa_count_levels(const class genesis::taxonomy::Taxonomy &) file:genesis/taxonomy/functions/taxonomy.hpp line:287
-	M("genesis::taxonomy").def("taxa_count_levels", (class std::vector<unsigned long, class std::allocator<unsigned long> > (*)(const class genesis::taxonomy::Taxonomy &)) &genesis::taxonomy::taxa_count_levels, "Count the number of \n\n\n\n\n\n\n\n\n\n\nC++: genesis::taxonomy::taxa_count_levels(const class genesis::taxonomy::Taxonomy &) --> class std::vector<unsigned long, class std::allocator<unsigned long> >", pybind11::arg("tax"));
 
 }

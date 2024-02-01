@@ -76,8 +76,8 @@ class PhylipTest(unittest.TestCase):
 
 		self.assertEqual( 5, sset.size())
 
-		#target = StringTarget()
-		#PhylipWriter().label_length(10).write( sset, to_string(target) )
+		target = StringTarget()
+		PhylipWriter().label_length(10).write( sset, to_string(target) )
 		#if 6 != count_substring_occurrences( target.get(), "\n" ):
 		#	print("Error at PHYLIP_WRITER-2")
 

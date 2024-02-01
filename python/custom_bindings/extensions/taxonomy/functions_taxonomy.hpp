@@ -4,8 +4,16 @@
 #include "genesis/taxonomy/taxonomy.hpp"
 #include "genesis/taxonomy/functions/taxonomy.hpp"
 
-inline void extend_functions_taxonomy(pybind11::module &handle)
+inline void extend_functions_taxonomy( pybind11::module &handle)
 {
+	handle.def(
+		"hahaha",
+		[]()
+		{
+			printf("hahaha\n");
+		}
+	);
+
 	handle.def(
 		"find_taxon_by_name",
 		[](::genesis::taxonomy::Taxonomy& tax, std::string& name) -> pybind11::object
@@ -16,9 +24,7 @@ inline void extend_functions_taxonomy(pybind11::module &handle)
 			} else {
 				return pybind11::none();
 			}
-		},
-		pybind11::arg("tax"),
-		pybind11::arg("name")
+		}
 	);
 }
 

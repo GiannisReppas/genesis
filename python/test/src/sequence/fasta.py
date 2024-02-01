@@ -93,9 +93,9 @@ class FastaTest(unittest.TestCase):
 		for seq in sset:
 			out_it << seq;
 
-		print("Hi over")
-		#data = file_read( infile );
-		#self.assertEqual( data, target.get())
+		#print("Hi over")
+		data = file_read( infile );
+		self.assertEqual( data, target.get())
 
 if __name__ == '__main__':
     unittest.main()
