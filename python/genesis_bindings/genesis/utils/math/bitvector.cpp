@@ -18,13 +18,12 @@
 #include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/utils/bitvector.hpp>
 #include <../python/custom_bindings/extensions/utils/range.hpp>
-#include <../python/custom_bindings/extensions/to_string.hpp>
+#include <../python/custom_bindings/extensions/string_target.hpp>
 #include <../python/custom_bindings/extensions/sequence/quality.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_set.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_dict.hpp>
 #include <../python/custom_bindings/extensions/sequence/fasta_input_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/fastq_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
@@ -45,7 +44,7 @@
 void bind_genesis_utils_math_bitvector(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
 
-	extend_to_string(M("genesis::utils"));
+	extend_string_target(M("genesis::utils"));
 	{ // genesis::utils::Bitvector file:genesis/utils/math/bitvector.hpp line:49
 		pybind11::class_<genesis::utils::Bitvector, std::shared_ptr<genesis::utils::Bitvector>> cl(M("genesis::utils"), "Bitvector", "");
 		cl.def( pybind11::init( [](){ return new genesis::utils::Bitvector(); } ) );

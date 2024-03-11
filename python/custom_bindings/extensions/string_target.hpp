@@ -5,6 +5,8 @@
 #include "genesis/utils/io/output_target.hpp"
 #include "genesis/utils/io/string_output_target.hpp"
 
+#include "genesis/sequence/formats/fasta_output_iterator.hpp"
+
 #include <pybind11/pytypes.h>
 
 #include <sstream>
@@ -23,7 +25,6 @@ namespace utils {
 struct StringTarget
 {
 public:
-
     // -------------------------------------------------------------------------
     //     Constructors and Rule of Five
     // -------------------------------------------------------------------------
@@ -33,23 +34,9 @@ public:
         target_ = ::genesis::utils::to_string( data_ );
     }
 
-    ~StringTarget() = default;
-
-    StringTarget(StringTarget const&) = default;
-    StringTarget(StringTarget&&)      = default;
-
-    StringTarget& operator= (StringTarget const&) = default;
-    StringTarget& operator= (StringTarget&&)      = default;
-
     // -------------------------------------------------------------------------
     //     Accessors
     // -------------------------------------------------------------------------
-
-    std::string const& get() const
-    {
-        target_->flush();
-        return data_;
-    }
 
     std::string& get()
     {
@@ -69,6 +56,35 @@ private:
 };
 
 }
+}
+
+inline void extend_string_target(pybind11::module &handle)
+{
+    pybind11::class_<::genesis::utils::StringTarget>(handle, "StringTarget")
+     .def(pybind11::init())
+     .def("get", &genesis::utils::StringTarget::get);
+
+    handle.def(
+        "to_string",
+        []( ::genesis::utils::StringTarget *target_string) -> std::shared_ptr<::genesis::utils::StringOutputTarget>
+        {
+            return std::make_shared< ::genesis::utils::StringOutputTarget >( target_string->get() );
+        }
+        ,
+        pybind11::return_value_policy::move
+    );
+}
+
+template<class T>
+inline void extend_fasta_output_iterator( pybind11::class_<T, std::shared_ptr<T> >& cl )
+{
+    cl.def(
+        pybind11::init( [](genesis::utils::StringTarget *target_string)
+        {
+            return new genesis::sequence::FastaOutputIterator( genesis::utils::to_string( target_string->get() ) );
+        }),
+        pybind11::return_value_policy::move
+    );
 }
 
 #endif

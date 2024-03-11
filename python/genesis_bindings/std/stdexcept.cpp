@@ -13,13 +13,12 @@
 #include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/utils/bitvector.hpp>
 #include <../python/custom_bindings/extensions/utils/range.hpp>
-#include <../python/custom_bindings/extensions/to_string.hpp>
+#include <../python/custom_bindings/extensions/string_target.hpp>
 #include <../python/custom_bindings/extensions/sequence/quality.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_set.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_dict.hpp>
 #include <../python/custom_bindings/extensions/sequence/fasta_input_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/fastq_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>

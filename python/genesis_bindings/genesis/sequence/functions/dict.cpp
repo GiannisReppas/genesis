@@ -28,13 +28,12 @@
 #include <genesis/utils/color/functions.hpp>
 #include <../python/custom_bindings/extensions/utils/bitvector.hpp>
 #include <../python/custom_bindings/extensions/utils/range.hpp>
-#include <../python/custom_bindings/extensions/to_string.hpp>
+#include <../python/custom_bindings/extensions/string_target.hpp>
 #include <../python/custom_bindings/extensions/sequence/quality.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_set.hpp>
 #include <../python/custom_bindings/extensions/sequence/sequence_dict.hpp>
 #include <../python/custom_bindings/extensions/sequence/fasta_input_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/fastq_input_iterator.hpp>
-#include <../python/custom_bindings/extensions/sequence/fasta_output_iterator.hpp>
 #include <../python/custom_bindings/extensions/sequence/reference_genome.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/taxopath.hpp>
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
@@ -113,6 +112,11 @@ void bind_genesis_sequence_functions_dict(std::function< pybind11::module &(std:
 	}
 	{ // genesis::sequence::FastaOutputIterator file:genesis/sequence/formats/fasta_output_iterator.hpp line:66
 		pybind11::class_<genesis::sequence::FastaOutputIterator, std::shared_ptr<genesis::sequence::FastaOutputIterator>> cl(M("genesis::sequence"), "FastaOutputIterator", "Write Fasta data, sequentially.\n\n This class allows to write Sequence data to an output target, using Fasta format, without\n the need to have a full SequenceSet containing all Sequence%s in memory.\n\n Exemplary usage:\n\n     auto out_it = FastaOutputIterator( utils::to_file( \"path/to/out.fasta\" ));\n     while( ... ) {\n         Sequence seq = ...\n         out_it << seq;\n     }\n\n See the output target convenience functions utils::to_file(), utils::to_stream(), and\n utils::to_string() for examples of how to obtain a suitable output target.");
+		cl.def( pybind11::init<class std::shared_ptr<class genesis::utils::BaseOutputTarget>>(), pybind11::arg("target") );
+
+		cl.def( pybind11::init<class std::shared_ptr<class genesis::utils::BaseOutputTarget>, const class genesis::sequence::FastaWriter &>(), pybind11::arg("target"), pybind11::arg("writer") );
+
+		cl.def( pybind11::init( [](genesis::sequence::FastaOutputIterator const &o){ return new genesis::sequence::FastaOutputIterator(o); } ) );
 		cl.def("assign", (class genesis::sequence::FastaOutputIterator & (genesis::sequence::FastaOutputIterator::*)(const class genesis::sequence::FastaOutputIterator &)) &genesis::sequence::FastaOutputIterator::operator=, "C++: genesis::sequence::FastaOutputIterator::operator=(const class genesis::sequence::FastaOutputIterator &) --> class genesis::sequence::FastaOutputIterator &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 		cl.def("__lshift__", (class genesis::sequence::FastaOutputIterator & (genesis::sequence::FastaOutputIterator::*)(const class genesis::sequence::Sequence &)) &genesis::sequence::FastaOutputIterator::operator<<, "C++: genesis::sequence::FastaOutputIterator::operator<<(const class genesis::sequence::Sequence &) --> class genesis::sequence::FastaOutputIterator &", pybind11::return_value_policy::reference_internal, pybind11::arg("seq"));
 		cl.def("writer", (class genesis::sequence::FastaWriter & (genesis::sequence::FastaOutputIterator::*)()) &genesis::sequence::FastaOutputIterator::writer, "Return the FastaWriter used for this iterator.\n\n Use this to change the settings and writing behaviour of the iterator.\n See FastaWriter for details.\n\nC++: genesis::sequence::FastaOutputIterator::writer() --> class genesis::sequence::FastaWriter &", pybind11::return_value_policy::reference_internal);

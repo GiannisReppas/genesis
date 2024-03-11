@@ -64,7 +64,6 @@ class FastaTest(unittest.TestCase):
 		self.assertEqual( "Di106BGTue", sset[0].label())
 		self.assertEqual( "TCGAAACCTGC------CTA", sset[0].sites()[0:20])
 
-	"""
 	def test_fasta_writer(self):
 		infile = "./test/data/sequence/dna_10.fasta"
 		sset = SequenceSet()
@@ -80,15 +79,14 @@ class FastaTest(unittest.TestCase):
 			print("Error at FASTA_WRITER-2")
 		if read_again != target.get():
 			print("Error at FASTA_WRITER-3")
-	"""
 
 	def test_fasta_output_iterator(self):
 		infile = "./test/data/sequence/dna_10.fasta"
 		sset = FastaReader().read( from_file( infile ))
-
-		target = ""
-		out_it = FastaOutputIterator( to_string(target))
-
+		
+		target = StringTarget()
+		out_it = FastaOutputIterator( target )
+		"""
 		out_it.writer().line_length( 50 );
 		for seq in sset:
 			out_it << seq;
@@ -96,6 +94,7 @@ class FastaTest(unittest.TestCase):
 		#print("Hi over")
 		data = file_read( infile );
 		self.assertEqual( data, target.get())
+		"""
 
 if __name__ == '__main__':
     unittest.main()
