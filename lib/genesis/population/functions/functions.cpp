@@ -1,6 +1,6 @@
 /*
     Genesis - A toolkit for working with phylogenetic data.
-    Copyright (C) 2014-2023 Lucas Czech
+    Copyright (C) 2014-2024 Lucas Czech
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -131,54 +131,11 @@ void set_base_count( BaseCounts& sample, char base, BaseCounts::size_type value 
 //     Sorting
 // =================================================================================================
 
-/**
- * @brief Local helper function that runs a sorting network to sort four values,
- * coming from the four nucleotides.
- *
- * The input are four values, either counts or frequencies. The output are the indices into this
- * array that are sorted so that the largest one comes first:
- *
- *     auto const data = std::array<T, 4>{ 15, 10, 20, 5 };
- *     auto const order = nucleotide_sorting_order_( data );
- *
- * yields `{ 2, 0, 1, 3 }`, so that `data[order[0]] = data[2] = 20` is the largest value,
- * `data[order[1]] = data[0] = 15` the second largest, and so forth.
- */
-template<typename T>
-std::array<size_t, 4> nucleotide_sorting_order_( std::array<T, 4> const& values )
-{
-    // Sort quickly via sorting network, putting large values first.
-    // See https://stackoverflow.com/a/25070688/4184258
-    auto indices = std::array<size_t, 4>{{ 0, 1, 2, 3 }};
-    if( values[indices[0]] < values[indices[1]] ) {
-        std::swap( indices[0], indices[1] );
-    }
-    if( values[indices[2]] < values[indices[3]] ) {
-        std::swap( indices[2], indices[3] );
-    }
-    if( values[indices[0]] < values[indices[2]] ) {
-        std::swap( indices[0], indices[2] );
-    }
-    if( values[indices[1]] < values[indices[3]] ) {
-        std::swap( indices[1], indices[3] );
-    }
-    if( values[indices[1]] < values[indices[2]] ) {
-        std::swap( indices[1], indices[2] );
-    }
-
-    // Now they are sorted, largest ones first.
-    assert( values[indices[0]] >= values[indices[1]] );
-    assert( values[indices[1]] >= values[indices[2]] );
-    assert( values[indices[2]] >= values[indices[3]] );
-
-    return indices;
-}
-
 SortedBaseCounts sorted_base_counts( BaseCounts const& sample )
 {
     // Sort quickly via sorting network, putting large values first.
     // See https://stackoverflow.com/a/25070688/4184258
-    // This is the same as above in nucleotide_sorting_order_(), but we here swap directly,
+    // This is the same as in nucleotide_sorting_order(), but we here swap directly,
     // for speed, as a tradeoff against code duplication...
     SortedBaseCounts result = {
         'A', sample.a_count,
@@ -251,7 +208,7 @@ std::pair<SortedBaseCounts, SortedBaseCounts> sorted_average_base_counts(
     }};
 
     // Get the sorting order, based on the averages.
-    auto const order = nucleotide_sorting_order_( avg_freqs );
+    auto const order = nucleotide_sorting_order( avg_freqs );
 
     // Now they are sorted, largest ones first.
     assert( avg_freqs[order[0]] >= avg_freqs[order[1]] );
@@ -598,17 +555,13 @@ void guess_and_set_ref_and_alt_bases( Variant& variant, bool force )
 
 void guess_and_set_ref_and_alt_bases(
     Variant& variant,
-    genesis::sequence::ReferenceGenome const& ref_genome,
+    char ref_base,
     bool force
 ) {
     // Shouldn't happen from our parsing etc, but better safe than sorry.
     if( variant.position == 0 ) {
         throw std::runtime_error( "Invalid position 0 in Variant." );
     }
-
-    // Get the reference sequence, and see if it is long enough. Throws if seq or base not present.
-    assert( variant.position > 0 );
-    auto const ref_base = ref_genome.get_base( variant.chromosome, variant.position );
 
     // Now use that reference base. If it is in ACGT, we use it as ref; if not, we check against
     // ambiguity codes to see if it fits with our count-based ref and alt bases instead.
@@ -661,6 +614,16 @@ void guess_and_set_ref_and_alt_bases(
             );
         }
     }
+}
+
+void guess_and_set_ref_and_alt_bases(
+    Variant& variant,
+    genesis::sequence::ReferenceGenome const& ref_genome,
+    bool force
+) {
+    // Get the reference base. Throws if seq or base not present.
+    auto const ref_base = ref_genome.get_base( variant.chromosome, variant.position );
+    return guess_and_set_ref_and_alt_bases( variant, ref_base, force );
 }
 
 // =================================================================================================

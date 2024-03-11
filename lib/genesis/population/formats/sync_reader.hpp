@@ -3,7 +3,7 @@
 
 /*
     Genesis - A toolkit for working with phylogenetic data.
-    Copyright (C) 2014-2023 Lucas Czech
+    Copyright (C) 2014-2024 Lucas Czech
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,16 @@ namespace population {
  *
  * See https://sourceforge.net/p/popoolation2/wiki/Tutorial/ for the original format description.
  * Unfortunately, the file format does not support sample names.
+ *
+ * We here support an ad-hoc extension of the `sync` format that offers a header line to store
+ * sample names, which are usually not available in the `sync` format. We currently expect a
+ * fixed format:
+ *
+ *     #chr	pos	ref	S1 S2...
+ *
+ * starting with a number sign (hashtag) `#` symbol, optionally followed by a tab character,
+ * and then listing the fixed columns `chr`, `pos`, and `ref`, followed by the sample name
+ * columns, all tab-delimited.
  *
  * We furthermore allow a custom extension of the format, where `.:.:.:.:.:.` represents missing data.
  * See allow_missing() and https://github.com/lczech/grenedalf/issues/4 for details.
@@ -207,8 +217,8 @@ public:
      * alternative base is also meaningless. In these cases, the alternative will be `N`.
      *
      * Note though that this can lead to conflicts between different files, if the second most
-     * abundant nucleotide differs between them, e.g., in non-biallelic positions. Usually we can
-     * deal with this, see for example VariantParallelInputIterator::Iterator::joined_variant().
+     * abundant nucleotide differs between them, e.g., in non-bia   llelic positions. Usually we can
+     * deal with this, see for example VariantParallelInputStream::Iterator::joined_variant().
      * Still, it is important to keep this in mind.
      */
     SyncReader& guess_alt_base( bool value )

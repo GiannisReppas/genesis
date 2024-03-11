@@ -1,6 +1,6 @@
 /*
     Genesis - A toolkit for working with phylogenetic data.
-    Copyright (C) 2014-2023 Lucas Czech
+    Copyright (C) 2014-2024 Lucas Czech
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@
 #include "src/common.hpp"
 
 #include "genesis/population/formats/simple_pileup_common.hpp"
-#include "genesis/population/formats/simple_pileup_input_iterator.hpp"
+#include "genesis/population/formats/simple_pileup_input_stream.hpp"
 #include "genesis/population/formats/simple_pileup_reader.hpp"
-#include "genesis/population/formats/variant_input_iterator.hpp"
+#include "genesis/population/streams/variant_input_stream.hpp"
 #include "genesis/population/functions/diversity_pool_calculator.hpp"
 #include "genesis/population/functions/diversity_pool_functions.hpp"
-#include "genesis/population/window/sliding_interval_window_iterator.hpp"
+#include "genesis/population/window/sliding_interval_window_stream.hpp"
 #include "genesis/population/window/sliding_window_generator.hpp"
 #include "genesis/population/window/window.hpp"
 #include "genesis/utils/containers/filter_iterator.hpp"
@@ -262,7 +262,7 @@ TEST( Population, DiversityMeasuresGenerator )
     reader.quality_encoding( genesis::sequence::QualityEncoding::kIllumina13 );
 
     // Iterate the data!
-    for( auto it = SimplePileupInputIterator<>( from_file( infile ), reader ); it; ++it ) {
+    for( auto it = SimplePileupInputStream<>( from_file( infile ), reader ); it; ++it ) {
         auto const& record = *it;
         ASSERT_EQ( 1, record.samples.size() );
 
@@ -365,15 +365,15 @@ TEST( Population, DiversityMeasuresIterator )
     reader.quality_encoding( genesis::sequence::QualityEncoding::kIllumina13 );
     reader.min_base_quality( min_phred_score );
 
-    // Make a Lambda Iterator over the data stream.
-    // LOG_DBG << "make_variant_input_iterator_from_pileup_file()";
-    auto data_gen = make_variant_input_iterator_from_pileup_file( infile, reader );
+    // Make a generic input stream over the data stream.
+    // LOG_DBG << "make_variant_input_stream_from_pileup_file()";
+    auto data_gen = make_variant_input_stream_from_pileup_file( infile, reader );
     auto pileup_begin = data_gen.begin();
     auto pileup_end   = data_gen.end();
 
-    // Create a window iterator based on the lambda iterator.
-    // LOG_DBG << "make_default_sliding_interval_window_iterator()";
-    auto win_it = make_default_sliding_interval_window_iterator(
+    // Create a window iterator based on the Generic Input Stream.
+    // LOG_DBG << "make_default_sliding_interval_window_stream()";
+    auto win_it = make_default_sliding_interval_window_stream(
         pileup_begin, pileup_end, window_width, window_stride
     );
     win_it.emit_leading_empty_windows( true );
@@ -417,7 +417,7 @@ TEST( Population, DiversityMeasuresIterator )
         filter.only_snps = true;
 
         // Make a filter that only allows samples that are SNPs and have the needed coverage.
-        // This could also be added to the lamda VariantInputIterator, if we were using one.
+        // This could also be added to the generic VariantInputStream, if we were using one.
         // Also, ount how many SNPs there are in total, and how many sites have the needed coverage.
         BaseCountsFilterStats stats;
         size_t variant_count = 0;

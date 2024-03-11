@@ -1,6 +1,6 @@
 /*
     Genesis - A toolkit for working with phylogenetic data.
-    Copyright (C) 2014-2023 Lucas Czech
+    Copyright (C) 2014-2024 Lucas Czech
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,9 @@
 #include "genesis/utils/core/std.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <limits>
 #include <stdexcept>
 
 namespace genesis {
@@ -60,7 +62,7 @@ const std::array<Bitvector::IntType, Bitvector::IntSize> Bitvector::bit_mask_ =
 
 const std::array<Bitvector::IntType, Bitvector::IntSize> Bitvector::ones_mask_ =
 {{
-    Bitvector::all_1_,       Bitvector::all_1_ >> 63, Bitvector::all_1_ >> 62, Bitvector::all_1_ >> 61,
+    Bitvector::all_0_,       Bitvector::all_1_ >> 63, Bitvector::all_1_ >> 62, Bitvector::all_1_ >> 61,
     Bitvector::all_1_ >> 60, Bitvector::all_1_ >> 59, Bitvector::all_1_ >> 58, Bitvector::all_1_ >> 57,
     Bitvector::all_1_ >> 56, Bitvector::all_1_ >> 55, Bitvector::all_1_ >> 54, Bitvector::all_1_ >> 53,
     Bitvector::all_1_ >> 52, Bitvector::all_1_ >> 51, Bitvector::all_1_ >> 50, Bitvector::all_1_ >> 49,
@@ -93,6 +95,12 @@ const std::array<Bitvector::IntType, 4> Bitvector::count_mask_ =
 Bitvector::Bitvector( size_t size, Bitvector const& other )
     : Bitvector::Bitvector( size, false )
 {
+    // Static test, needs to be here, as the constant is private.
+    static_assert(
+        Bitvector::all_1_ == static_cast<Bitvector::IntType>(0) - 1,
+        "Bitvector::all_1_ is not all one"
+    );
+
     // if( &other == this ) {
     //     throw std::runtime_error(
     //         "In Bitvector::Bitvector( size_t, Bitvector const& ): Cannot self assign."
@@ -139,6 +147,70 @@ Bitvector::Bitvector( std::string const& values )
 //     data_ = std::vector<IntType>( other.data_.begin(), other.data_.begin() + ds );
 //     unset_padding_();
 // }
+
+// =============================================================================
+//     Bit Functions
+// =============================================================================
+
+void Bitvector::set( size_t first, size_t last, bool value )
+{
+    // Boundary checks
+    if( first >= size_ || last > size_ || first > last ) {
+        throw std::out_of_range(
+            "Cannot access invalid range [" + std::to_string(first) + ", " + std::to_string(last) +
+            ") in Bitvector of size " + std::to_string(size_)
+        );
+    }
+    assert( first <  size_ );
+    assert( last  <= size_ );
+    assert( first <= last );
+
+    // Check special case, as we might otherwise access invalid data at the boundaries.
+    if( first == last ) {
+        return;
+    }
+    assert( last > 0 );
+
+    // Get word indices, and bit position indices within those words.
+    // The last word is the one where the bit before `last` is, as `last` is past-the-end.
+    // However, the bit index is still needs to be past-the-end, to use the proper mask.
+    auto const f_wrd_idx = first / IntSize;
+    auto const l_wrd_idx = (last - 1) / IntSize;
+    auto const f_bit_idx = first % IntSize;
+    auto const l_bit_idx = last % IntSize;
+    assert( f_wrd_idx < data_.size() );
+    assert( l_wrd_idx < data_.size() );
+    assert( f_bit_idx < ones_mask_.size() );
+    assert( l_bit_idx < ones_mask_.size() );
+
+    // Get the two words at the boundary. We later check if they are the same,
+    // so we do not repeat the code here, and treat the special case later.
+    auto const f_mask = ~ones_mask_[ f_bit_idx ];
+    auto const l_mask = l_bit_idx == 0 ? all_1_ : ones_mask_[ l_bit_idx ];
+
+    // Now set the bits as needed for the range.
+    if( f_wrd_idx == l_wrd_idx ) {
+        if( value ) {
+            data_[ f_wrd_idx ] |=  ( f_mask & l_mask );
+        } else {
+            data_[ f_wrd_idx ] &= ~( f_mask & l_mask );
+        }
+    } else {
+        if( value ) {
+            data_[ f_wrd_idx ] |= f_mask;
+            for( size_t i = f_wrd_idx + 1; i < l_wrd_idx; ++i ) {
+                data_[i] = all_1_;
+            }
+            data_[ l_wrd_idx ] |= l_mask;
+        } else {
+            data_[ f_wrd_idx ] &= ~f_mask;
+            for( size_t i = f_wrd_idx + 1; i < l_wrd_idx; ++i ) {
+                data_[i] = all_0_;
+            }
+            data_[ l_wrd_idx ] &= ~l_mask;
+        }
+    }
+}
 
 // =============================================================================
 //     Operators
@@ -300,16 +372,14 @@ size_t Bitvector::count( size_t first, size_t last ) const
     auto l_word = data_[ l_wrd_idx ];
 
     // Mask out the beginning and end, respectively.
-    // Special case for the beginning: we only apply the mask if not all bits are needed.
-    if( f_bit_idx > 0 ) {
-        // Remove all bits before the first index.
-        f_word &= ~( ones_mask_[ f_bit_idx ]);
-    }
-    // Remove all bits after and including the last index.
+    // Remove all bits before the first index, and all bits after and including the last index.
     // No special case needed here, as the 0th mask is idempotent.
     // That's because it's the mask that we also use for unset_padding_(),
     // we are basically doing the same here.
-    l_word &= ones_mask_[ l_bit_idx ];
+    f_word &= ~ones_mask_[ f_bit_idx ];
+    if( l_bit_idx != 0 ) {
+        l_word &=  ones_mask_[ l_bit_idx ];
+    }
 
     // Finally, count up all the parts.
     size_t result = 0;
@@ -325,6 +395,76 @@ size_t Bitvector::count( size_t first, size_t last ) const
         }
     }
     return result;
+}
+
+size_t Bitvector::find_next_set( size_t start ) const
+{
+    // Boundary check
+    if( start >= size_ ) {
+        // We mimic the behaviour of std::string::find(), which just never finds anything
+        // when used beyond the string, but also does not throw an exception in such cases.
+        return std::numeric_limits<size_t>::max();
+        // throw std::invalid_argument(
+        //     "Invalid call to find_next_set() with start==" + std::to_string(start) +
+        //     " and a Bitvector of size " + std::to_string( size_ )
+        // );
+    }
+
+    // Helper function to find the index of the first set bit in a non-zero word.
+    auto find_next_set_in_word_ = []( IntType word ) {
+        assert( word != 0 );
+
+        // We use ffs here, see https://man7.org/linux/man-pages/man3/ffs.3.html
+        // It returns the _position_ of the bit, so we need to subtract 1 to get the index.
+        // Alternatively, we could use __builtin_ctz, which returns the number of trailing
+        // zeros in the given word, but is a compiler intrinsic, so let's stay with POSIX.
+
+        // Check the size of the input and call the appropriate ffs function.
+        // Any good compiler will see through this and make this constexpr.
+        // In C++17, we could do this ourselves ;-)
+        if( sizeof(word) <= sizeof(unsigned int) ) {
+            return ffs( static_cast<unsigned int>( word )) - 1;
+        } else if( sizeof(word) <= sizeof(unsigned long) ) {
+            return ffsl( static_cast<unsigned long>( word )) - 1;
+        } else {
+            return ffsll(word) - 1;
+        }
+    };
+
+    // First see if there is anything in the word at the start position.
+    // We assume that this function might be called on a dense bitvector,
+    // where the given position is already set, so we check that as a shortcut.
+    if( get( start )) {
+        return start;
+    }
+
+    // If that did not work, we see if there is anything in the current word.
+    auto wrd_idx = start / IntSize;
+    auto bit_idx = start % IntSize;
+    assert( wrd_idx < data_.size() );
+    assert( bit_idx < ones_mask_.size() );
+    auto word = data_[wrd_idx];
+
+    // For this, we remove the bits before start, and then test the rest.
+    // Mask out the beginning of the word, and find the next bit on the remainder.
+    // Remove all bits before the first index.
+    word &= ~( ones_mask_[ bit_idx ]);
+    if( word != 0 ) {
+        return wrd_idx * IntSize + find_next_set_in_word_( word );
+    }
+
+    // We did not find a bit in the word of the start. So now we look for the first word
+    // after the start one that has bits set, and return its first set bit position.
+    ++wrd_idx;
+    while( wrd_idx < data_.size() && data_[wrd_idx] == 0 ) {
+        ++wrd_idx;
+    }
+    if( wrd_idx == data_.size() ) {
+        return std::numeric_limits<size_t>::max();
+    }
+    assert( wrd_idx < data_.size() );
+    assert( data_[wrd_idx] != 0 );
+    return wrd_idx * IntSize + find_next_set_in_word_( data_[wrd_idx] );
 }
 
 size_t Bitvector::hash() const
@@ -367,12 +507,12 @@ void Bitvector::set_all( const bool value )
 {
     // set according to flag.
     const auto v = value ? all_1_ : all_0_;
-    for (size_t i = 0; i < data_.size(); ++i) {
+    for( size_t i = 0; i < data_.size(); ++i ) {
         data_[i] = v;
     }
 
     // if we initialized with true, we need to unset the surplus bits at the end!
-    if (value) {
+    if( value ) {
         unset_padding_();
     }
 }
@@ -384,12 +524,13 @@ void Bitvector::set_all( const bool value )
 void Bitvector::unset_padding_()
 {
     // Only apply if there are actual padding bits.
-    // if(( size_ % IntSize ) == 0 ) {
-    //     return;
-    // }
-    // --> Nope, we have changed the mask to be all-one for its first entry, so that we
-    // can avoid the branching here!
+    if(( size_ % IntSize ) == 0 ) {
+        assert( size_ / IntSize == data_.size() );
+        return;
+    }
 
+    // In the other cases, unset the padding.
+    assert( size_ / IntSize + 1 == data_.size() );
     assert( size_ % IntSize < ones_mask_.size() );
     data_.back() &= ones_mask_[ size_ % IntSize ];
 
