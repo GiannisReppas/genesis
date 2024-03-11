@@ -69,8 +69,7 @@ class FastaTest(unittest.TestCase):
 		sset = SequenceSet()
 		FastaReader().valid_chars( nucleic_acid_codes_all() ).read( from_file(infile), sset)
 
-		if 10 != sset.size():
-			print("Error at FASTA_WRITER-1")
+		self.assertEqual(10, sset.size())
 
 		target = StringTarget()
 		FastaWriter().line_length(50).write( sset, to_string( target ))

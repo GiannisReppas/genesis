@@ -15,7 +15,8 @@ why ::genesis::utils::operator<< won't compile for template parameter ::genesis:
 
 
 ////////// sequence
-from_string, to string errors
+fasta, fastq, phylip, print tests have to_string-related errors
+try to write advanced and rangedBased tests in fasta.py
 
 
 ////////// taxonomy

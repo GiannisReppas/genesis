@@ -69,7 +69,7 @@
 // utils/tools/char_lookup
 #include <genesis/utils/tools/char_lookup.hpp>
 
-// utils/tools/input_source
+// utils/tools/io/input_source
 #include <genesis/utils/core/std.hpp>
 #include <genesis/utils/core/logging.hpp>
 #include <genesis/utils/core/fs.hpp>
@@ -167,8 +167,6 @@
 #include <../python/custom_bindings/template_instances/char_lookup.hpp>
 #include <../python/custom_bindings/template_instances/math_matrix.hpp>
 
-// lambda_iterator
-#include <genesis/utils/containers/lambda_iterator.hpp>
 
 /* sequence */
 
@@ -457,49 +455,3 @@
 
 /* population */
 
-
-// bed_reader test
-#include <genesis/population/genome_region.hpp>
-#include <genesis/population/genome_locus.hpp>
-#include <genesis/population/genome_region_list.hpp> // population/genome_locus , population/genome_region , utils/containers/interval_tree
-#include <genesis/population/genome_locus_set.hpp> // population/genome_locus , population/genome_region , population/genome_region_list , utils/math/bitvector
-#include <genesis/population/formats/bed_reader.hpp>
-// utils/io/input_source , utils/io/input_stream
-
-// chromosome_iterator test
-#include <genesis/population/base_counts.hpp>
-#include <genesis/population/variant.hpp> // population/base_counts
-#include <genesis/population/formats/simple_pileup_reader.hpp> // utils/io/input_stream , utils/io/input_source , sequence/functions/quality , population/variant
-#include <genesis/population/formats/simple_pileup_input_iterator.hpp> // utils/io/input_source , utils/math/bitvector/helper , population/formats/simple_pileup_reader
-#include <genesis/population/formats/frequency_table_input_iterator.hpp> // population/variant , sequence/reference_genome , utils/io/input_source , utils/io/input_stream
-#include <genesis/population/formats/sam_variant_input_iterator.hpp> // population/base_counts , population/functions/genome_locus , population/genome_locus_set , population/genome_locus , population/variant , utils/core/fs
-#include <genesis/population/formats/sync_reader.hpp> // population/variant , utils/io/input_source , utils/io/input_stream
-#include <genesis/population/formats/sync_input_iterator.hpp> // utils/io/input_source , population/formats/sync_reader
-#include <genesis/population/formats/hts_file.hpp>
-#include <genesis/population/formats/vcf_common.hpp> // population/genome_locus_set , population/genome_region , population/genome_region_list
-#include <genesis/population/formats/vcf_header.hpp> // population/formats/hts_file , population/formats/vcf_common
-#include <genesis/population/formats/vcf_format_iterator.hpp> // population/formats/vcf_common , population/formats/vcf_header
-#include <genesis/population/formats/vcf_record.hpp> // utils/containers/range , population/formats/vcf_header , population/formats/vcf_common , population/formats/vcf_format_iterator
-#include <genesis/population/formats/vcf_input_iterator.hpp> // population/formats/hts_file , population/formats/vcf_header , population/formats/vcf_record
-#include <genesis/population/formats/variant_input_iterator.hpp>  // utils/containers/lambda_iterator , population/variant , /population/base_counts , population/formats/simple_pileup_input_iterator , population/formats/frequency_table_input_iterator , population/formats/sam_variant_input_iterator , population/formats/sync_reader , population/formats/sync_input_iterator , population/formats/vcf_input_iterator
-#include <genesis/population/window/base_window.hpp> // population/genome_region
-#include <genesis/population/window/window.hpp>  // population/genome_region , population/window/base_window
-#include <genesis/population/window/window_view.hpp> // population/window/window , population/window/base_window
-#include <genesis/population/window/functions.hpp> // population/window/window , population/window/window_view , population/window/base_window
-#include <genesis/population/window/base_window_iterator.hpp> // utils/core/std , utils/containers/range , population/window/window.
-#include <genesis/population/window/chromosome_iterator.hpp> // population/window/window_view , population/window/base_window_iterator
-// utils/containers/lambda_iterator
-
-// variant test
-#include <genesis/population/functions/functions.hpp> // population/base_counts , population/variant , sequence/reference_genome , utils/text/char
-// population/variant , population/formats/vcf_common , population/formats/vcf_header , population/formats/vcf_record
-
-// functions test
-// population/base_counts , population/variant , population/functions/functions , sequence/reference_genom
-
-// vcf basics test
-// population/formats/hts_file , population/formats/vcf_common , population/formats/vcf_header , population/formats/vcf_input_iterator , population/formats/vcf_record , utils/text/string
-
-// template instances
-#include <../python/custom_bindings/template_instances/lambda_iterator.hpp>
-#include <../python/custom_bindings/template_instances/chromosome_iterator.hpp>

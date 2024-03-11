@@ -13,15 +13,11 @@ class FastqTest(unittest.TestCase):
 		sset = SequenceSet()
 		FastqReader().read( from_file(infile), sset)
 
-		if 2 != sset.size():
-			print("Error at FASTQ_READER")
-		if "GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAATCCATTTGTTCAACTCACAGTTT" != sset[0].sites():
-			print("Error at FASTQ_READER")
-		if sset[0].size() != len(sset[0].phred_scores()):
-			print("Error at FASTQ_READER")
+		self.assertEqual( 2, sset.size() )
+		self.assertEqual( "GATTTGGGGTTCAAAGCAGTATCGATCAAATAGTAAATCCATTTGTTCAACTCACAGTTT", sset[0].sites() )
+		self.assertEqual( sset[0].size(), len(sset[0].phred_scores()) )
 
-		if 6 != sset[0].phred_scores()[1]:
-			print("Error at FASTQ_READER")
+		self.assertEqual( 6, sset[0].phred_scores()[1] )
 
 		qual_0 = [
 		     0,  6,  6,  9,  7,  7,  7,  7,  9,  9,  9, 10,  8,  8,  4,  4,  4, 10, 10,  8,
@@ -36,17 +32,14 @@ class FastqTest(unittest.TestCase):
 		    33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33
 		]
 
-		if qual_0 != sset[0].phred_scores():
-			print("Error at FASTQ_READER")
-		if qual_1 != sset[1].phred_scores():
-			print("Error at FASTQ_READER")
+		self.assertEqual( qual_0, sset[0].phred_scores())
+		self.assertEqual( qual_1, sset[1].phred_scores())
 
 	def test_fastq_encoding(self):
 		infile = "./test/data/sequence/SP1.fq";
 
 		enc = guess_fastq_quality_encoding( from_file( infile ));
-		if QualityEncoding.kSanger != enc:
-			print("Error at FASTQ_ENCODING")
+		self.assertEqual( QualityEncoding.kSanger, enc)
 
 	def test_fastq_input_iterator(self):
 		infile = "./test/data/sequence/SP1.fq"
@@ -56,8 +49,7 @@ class FastqTest(unittest.TestCase):
 		for it in fastq_input_iterator:
 			cnt += 1
 
-		if 250 != cnt:
-			print("Error at FASTQ_INPUT_ITERATOR-1")
+		self.assertEqual( 250, cnt)
 
 	def test_fastq_writer(self):
 		infile = "./test/data/sequence/SP1.fq";
@@ -67,8 +59,7 @@ class FastqTest(unittest.TestCase):
 		FastqWriter().write( sset, to_string( written ))
 
 		data = file_read( infile );
-		if data != written.get():
-			print("Error at FASTQ_WRITER-1")
+		self.assertEqual(data, written.get())
 
 	def test_fastq_output_iterator(self):
 		infile = "./test/data/sequence/SP1.fq"
