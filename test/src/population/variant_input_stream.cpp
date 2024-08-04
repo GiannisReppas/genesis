@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     Contact:
-    Lucas Czech <lczech@carnegiescience.edu>
-    Department of Plant Biology, Carnegie Institution For Science
-    260 Panama Street, Stanford, CA 94305, USA
+    Lucas Czech <lucas.czech@sund.ku.dk>
+    University of Copenhagen, Globe Institute, Section for GeoGenetics
+    Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
 /**
@@ -30,12 +30,16 @@
 
 #include "src/common.hpp"
 
-#include "genesis/population/base_counts.hpp"
-#include "genesis/population/streams/variant_input_stream.hpp"
-#include "genesis/population/streams/variant_parallel_input_stream.hpp"
-#include "genesis/population/functions/filter_transform.hpp"
-#include "genesis/population/functions/functions.hpp"
-#include "genesis/population/functions/variant_input_stream.hpp"
+#include "genesis/population/sample_counts.hpp"
+#include "genesis/population/stream/variant_input_stream_adapters.hpp"
+#include "genesis/population/stream/variant_input_stream_sources.hpp"
+#include "genesis/population/stream/variant_input_stream.hpp"
+#include "genesis/population/stream/variant_parallel_input_stream.hpp"
+#include "genesis/population/filter/variant_filter_numerical.hpp"
+#include "genesis/population/filter/variant_filter_positional.hpp"
+#include "genesis/population/filter/variant_filter.hpp"
+#include "genesis/population/function/functions.hpp"
+#include "genesis/population/function/variant_input_stream.hpp"
 #include "genesis/utils/text/string.hpp"
 
 #include <unordered_set>
@@ -59,15 +63,15 @@ TEST( VariantInputStream, SamInputStream )
 
     // Add a filter that limits it to a region, and then skips a region inside.
     it.add_filter(
-        make_filter_by_region( GenomeRegion( "seq1", 272, 279 ))
+        make_variant_filter_by_region_excluding( GenomeRegion( "seq1", 272, 279 ))
     );
     it.add_filter(
-        make_filter_by_region( GenomeRegion( "seq1", 274, 277 ), true )
+        make_variant_filter_by_region_excluding( GenomeRegion( "seq1", 274, 277 ), true )
     );
 
     // Add a filter that doesn't do anything
     it.add_filter(
-        make_filter_by_region( GenomeRegion("not_a_chr", 100, 200), true )
+        make_variant_filter_by_region_excluding( GenomeRegion("not_a_chr", 100, 200), true )
     );
 
     // Simple test that the correct region is filtered out.
@@ -142,15 +146,15 @@ TEST( VariantInputStream, PileupInputStream )
     // Add a filter that skips the specified region.
     auto region = GenomeRegion( "seq1", 274, 277 );
     // it.add_filter(
-    //     make_filter_by_region( region )
+    //     make_variant_filter_by_region_excluding( region )
     // );
     it.add_filter(
-        make_filter_by_region( region, true )
+        make_variant_filter_by_region_excluding( region, true )
     );
 
     // Add a filter that doesn't do anything
     it.add_filter(
-        make_filter_by_region( GenomeRegion("not_a_chr", 100, 200), true )
+        make_variant_filter_by_region_excluding( GenomeRegion("not_a_chr", 100, 200), true )
     );
 
     // Simple test that the correct region is filtered out.
@@ -210,7 +214,7 @@ TEST( VariantInputStream, PileupInputStreamSampleFilter )
         );
         for( auto const& variant : it ) {
             EXPECT_EQ( 1, variant.samples.size() );
-            auto const sum = total_nucleotide_sum( variant );
+            auto const sum = total_nucleotide_sum( variant, SampleCountsFilterPolicy::kAll );
             EXPECT_TRUE( sum == 0 || sum == 1 );
         }
     }
@@ -222,7 +226,7 @@ TEST( VariantInputStream, PileupInputStreamSampleFilter )
         );
         for( auto const& variant : it ) {
             EXPECT_EQ( 1, variant.samples.size() );
-            auto const sum = total_nucleotide_sum( variant );
+            auto const sum = total_nucleotide_sum( variant, SampleCountsFilterPolicy::kAll );
             EXPECT_TRUE( sum == 0 || sum == 2 );
         }
     }
@@ -234,7 +238,7 @@ TEST( VariantInputStream, PileupInputStreamSampleFilter )
         );
         for( auto const& variant : it ) {
             EXPECT_EQ( 1, variant.samples.size() );
-            auto const sum = total_nucleotide_sum( variant );
+            auto const sum = total_nucleotide_sum( variant, SampleCountsFilterPolicy::kAll );
             EXPECT_TRUE( sum == 0 || sum == 1 );
         }
     }
@@ -246,7 +250,7 @@ TEST( VariantInputStream, PileupInputStreamSampleFilter )
         );
         for( auto const& variant : it ) {
             EXPECT_EQ( 1, variant.samples.size() );
-            auto const sum = total_nucleotide_sum( variant );
+            auto const sum = total_nucleotide_sum( variant, SampleCountsFilterPolicy::kAll );
             EXPECT_TRUE( sum == 0 || sum == 2 );
         }
     }
@@ -298,12 +302,12 @@ TEST( VariantInputStream, SyncInputStream )
     // Add a filter that skips the specified region.
     auto region = GenomeRegion( "2R", 2302, 2302 );
     it.add_filter(
-        make_filter_by_region( region, true )
+        make_variant_filter_by_region_excluding( region, true )
     );
 
     // Add a filter that doesn't do anything
     it.add_filter(
-        make_filter_by_region( GenomeRegion("not_a_chr", 100, 200), true )
+        make_variant_filter_by_region_excluding( GenomeRegion("not_a_chr", 100, 200), true )
     );
 
     // Simple test that the correct region is filtered out.
@@ -429,26 +433,30 @@ TEST( VariantInputStream, VcfInputStream )
     // Skip test if no data availabe.
     NEEDS_TEST_DATA;
     std::string const infile = environment->data_dir + "population/example_ad.vcf";
-    auto it = make_variant_input_stream_from_pool_vcf_file( infile, false, false );
+    auto it = make_variant_input_stream_from_pool_vcf_file( infile );
     EXPECT_EQ( "example_ad", it.data().source_name );
 
     // Add a filter that skips the specified region.
     auto region = GenomeRegion( "20", 17000, 1120000 );
     it.add_filter(
-        make_filter_by_region( region, true )
+        make_variant_filter_by_region_excluding( region, true )
     );
 
     // Add a filter that doesn't do anything
     it.add_filter(
-        make_filter_by_region( GenomeRegion("not_a_chr", 100, 200), true )
+        make_variant_filter_by_region_excluding( GenomeRegion("not_a_chr", 100, 200), true )
     );
 
     // Simple test that the correct region is filtered out.
     std::string result;
     for( auto const& variant : it ) {
         result += " " + std::to_string( variant.position );
+        // LOG_DBG << variant.chromosome << ":" << variant.position;
+        // for( auto const& s : variant.samples ) {
+        //     LOG_DBG1 << s;
+        // }
     }
-    EXPECT_EQ( " 14370 1230237", result );
+    EXPECT_EQ( " 14370 1230237 1230238", result );
 
     // Test cases for missing file.
     EXPECT_ANY_THROW( make_variant_input_stream_from_pool_vcf_file( "" ));
@@ -463,46 +471,63 @@ TEST( VariantInputStream, VcfInputStreamSampleFilter )
 
     // Filter empty. All samples are there, as this is equivalent to no filtering.
     {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{};
         auto it = make_variant_input_stream_from_pool_vcf_file(
-            infile, std::vector<std::string>{}
+            infile, params
         );
         EXPECT_EQ( 3, it.begin()->samples.size() );
     }
 
     // Filter empty, inversed. All samples are there, as this is equivalent to no filtering.
     {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{};
+        params.inverse_sample_names = true;
         auto it = make_variant_input_stream_from_pool_vcf_file(
-            infile, std::vector<std::string>{}, true
+            infile, params
         );
         EXPECT_EQ( 3, it.begin()->samples.size() );
     }
 
     // Filter NA00002.
     {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{ "NA00002" };
         auto it = make_variant_input_stream_from_pool_vcf_file(
-            infile, std::vector<std::string>{ "NA00002" }
+            infile, params
         );
         EXPECT_EQ( 1, it.begin()->samples.size() );
     }
 
     // Filter NA00002, inversed. Two samples remain.
     {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{ "NA00002" };
+        params.inverse_sample_names = true;
         auto it = make_variant_input_stream_from_pool_vcf_file(
-            infile, std::vector<std::string>{ "NA00002" }, true
+            infile, params
         );
         EXPECT_EQ( 2, it.begin()->samples.size() );
     }
 
     // Filter invalid.
     {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{ "XYZ" };
         EXPECT_ANY_THROW(
              make_variant_input_stream_from_pool_vcf_file(
-                infile, std::vector<std::string>{ "XYZ" }
+                infile, params
             )
         );
+    }
+    {
+        VariantInputStreamFromVcfParams params;
+        params.sample_names = std::vector<std::string>{ "XYZ" };
+        params.inverse_sample_names = true;
         EXPECT_ANY_THROW(
              make_variant_input_stream_from_pool_vcf_file(
-                infile, std::vector<std::string>{ "XYZ" }, true
+                infile, params
             )
         );
     }
@@ -578,7 +603,7 @@ TEST( VariantInputStream, ParallelInputStream2 )
 
     // VCF in.
     std::string const vcf_infile = environment->data_dir + "population/example_ad.vcf";
-    auto vcf_it = make_variant_input_stream_from_pool_vcf_file( vcf_infile, false, false );
+    auto vcf_it = make_variant_input_stream_from_pool_vcf_file( vcf_infile );
 
     // Make parallel iterator from all source.
     VariantParallelInputStream parallel;
@@ -621,7 +646,7 @@ TEST( VariantInputStream, ParallelInputStream2 )
 void test_variant_input_stream_unordered_chromosomes_(
     VariantInputStream& it,
     size_t expected_positions,
-    bool with_observer,
+    bool with_observers,
     bool with_dict,
     bool good_sequence_lengths
 ) {
@@ -642,8 +667,11 @@ void test_variant_input_stream_unordered_chromosomes_(
     }
 
     // Add a check observer to the iterator.
-    if( with_observer ) {
-        it.add_observer(
+    if( with_observers ) {
+        it.add_on_enter_observer(
+            make_variant_input_stream_sequence_order_observer( sequence_dict )
+        );
+        it.add_on_leave_observer(
             make_variant_input_stream_sequence_order_observer( sequence_dict )
         );
     }

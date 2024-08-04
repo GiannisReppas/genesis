@@ -30,9 +30,10 @@
 
 #include "src/common.hpp"
 
-#include "genesis/population/formats/frequency_table_input_stream.hpp"
-#include "genesis/population/functions/functions.hpp"
-#include "genesis/population/streams/variant_input_stream.hpp"
+#include "genesis/population/format/frequency_table_input_stream.hpp"
+#include "genesis/population/function/functions.hpp"
+#include "genesis/population/stream/variant_input_stream.hpp"
+#include "genesis/population/stream/variant_input_stream_sources.hpp"
 
 #include <cmath>
 #include <limits>
@@ -70,7 +71,7 @@ TEST( FrequencyTableInputStream, Read )
     // reader.header_sample_reference_count_substring( "refcnt" );
     // reader.header_sample_alternative_count_substring( "altcount" );
     // reader.header_sample_frequency_substring( ".freq" );
-    // reader.header_sample_coverage_substring( "coverage-" );
+    // reader.header_sample_read_depth_substring( "coverage-" );
     auto it = make_variant_input_stream_from_frequency_table_file( infile, '\t', reader );
     for( auto const& var : it ) {
         variants.emplace_back( var );
@@ -79,7 +80,9 @@ TEST( FrequencyTableInputStream, Read )
     EXPECT_EQ( infile,    it.data().file_path );
     EXPECT_EQ( "freq1",   it.data().source_name );
     EXPECT_EQ( exp_names, it.data().sample_names );
-    ASSERT_EQ( 2, variants.size() );
+    ASSERT_EQ( 3, variants.size() );
+
+    // ---------------------------------------------------
 
     // First line
     EXPECT_EQ( "1", variants[0].chromosome );
@@ -89,12 +92,12 @@ TEST( FrequencyTableInputStream, Read )
     ASSERT_EQ(   4, variants[0].samples.size() );
 
     // First line, first sample
-    EXPECT_EQ(                0, variants[0].samples[0].a_count );
-    EXPECT_EQ( 5404319552844595, variants[0].samples[0].c_count );
-    EXPECT_EQ(                0, variants[0].samples[0].g_count );
-    EXPECT_EQ( 3602879701896397, variants[0].samples[0].t_count );
-    EXPECT_EQ(                0, variants[0].samples[0].n_count );
-    EXPECT_EQ(                0, variants[0].samples[0].d_count );
+    EXPECT_EQ(      0, variants[0].samples[0].a_count );
+    EXPECT_EQ( 600000, variants[0].samples[0].c_count );
+    EXPECT_EQ(      0, variants[0].samples[0].g_count );
+    EXPECT_EQ( 400000, variants[0].samples[0].t_count );
+    EXPECT_EQ(      0, variants[0].samples[0].n_count );
+    EXPECT_EQ(      0, variants[0].samples[0].d_count );
 
     // First line, second sample
     EXPECT_EQ(  0, variants[0].samples[1].a_count );
@@ -120,6 +123,8 @@ TEST( FrequencyTableInputStream, Read )
     EXPECT_EQ(  0, variants[0].samples[3].n_count );
     EXPECT_EQ(  0, variants[0].samples[3].d_count );
 
+    // ---------------------------------------------------
+
     // Second line
     EXPECT_EQ( "1", variants[1].chromosome );
     EXPECT_EQ(   5, variants[1].position );
@@ -128,12 +133,12 @@ TEST( FrequencyTableInputStream, Read )
     ASSERT_EQ(   4, variants[1].samples.size() );
 
     // Second line, first sample
-    EXPECT_EQ(                0, variants[1].samples[0].a_count );
-    EXPECT_EQ( 4503599627370496, variants[1].samples[0].c_count );
-    EXPECT_EQ( 4503599627370496, variants[1].samples[0].g_count );
-    EXPECT_EQ(                0, variants[1].samples[0].t_count );
-    EXPECT_EQ(                0, variants[1].samples[0].n_count );
-    EXPECT_EQ(                0, variants[1].samples[0].d_count );
+    EXPECT_EQ(      0, variants[1].samples[0].a_count );
+    EXPECT_EQ( 500000, variants[1].samples[0].c_count );
+    EXPECT_EQ( 500000, variants[1].samples[0].g_count );
+    EXPECT_EQ(      0, variants[1].samples[0].t_count );
+    EXPECT_EQ(      0, variants[1].samples[0].n_count );
+    EXPECT_EQ(      0, variants[1].samples[0].d_count );
 
     // Second line, second sample
     EXPECT_EQ(  0, variants[1].samples[1].a_count );
@@ -158,4 +163,19 @@ TEST( FrequencyTableInputStream, Read )
     EXPECT_EQ(  0, variants[1].samples[3].t_count );
     EXPECT_EQ(  0, variants[1].samples[3].n_count );
     EXPECT_EQ(  0, variants[1].samples[3].d_count );
+
+    // ---------------------------------------------------
+
+    // Third line, everything is nan
+    EXPECT_EQ( "1", variants[2].chromosome );
+    EXPECT_EQ(   6, variants[2].position );
+    EXPECT_EQ( 'A', variants[2].reference_base );
+    EXPECT_EQ( 'G', variants[2].alternative_base );
+    ASSERT_EQ(   4, variants[2].samples.size() );
+
+    // All missing
+    EXPECT_FALSE( variants[2].samples[0].status.passing() );
+    EXPECT_FALSE( variants[2].samples[1].status.passing() );
+    EXPECT_FALSE( variants[2].samples[2].status.passing() );
+    EXPECT_FALSE( variants[2].samples[3].status.passing() );
 }

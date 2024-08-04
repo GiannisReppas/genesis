@@ -30,10 +30,10 @@
 
 #include "src/common.hpp"
 
-#include "genesis/population/base_counts.hpp"
+#include "genesis/population/sample_counts.hpp"
 #include "genesis/population/variant.hpp"
-#include "genesis/population/functions/subsample.hpp"
-#include "genesis/population/functions/functions.hpp"
+#include "genesis/population/function/subsample.hpp"
+#include "genesis/population/function/functions.hpp"
 #include "genesis/utils/math/random.hpp"
 
 using namespace genesis::population;
@@ -41,8 +41,9 @@ using namespace genesis::sequence;
 using namespace genesis::utils;
 
 template<typename Transformer>
-void test_base_counts_subsampling_(
-    Transformer transformer
+void test_sample_counts_subsampling_(
+    Transformer transformer,
+    bool skip_if_below_target_depth
 ) {
     // Random seed. Report it, so that in an error case, we can reproduce.
     auto const seed = ::time(nullptr);
@@ -50,45 +51,78 @@ void test_base_counts_subsampling_(
     LOG_INFO << "Seed: " << seed;
 
     auto const n = 50000;
+    // auto const n = 10;
     for( size_t i = 0; i < n; ++i ) {
-        BaseCounts sample;
-        sample.a_count = permuted_congruential_generator( 1000 );
-        sample.c_count = permuted_congruential_generator( 1000 );
-        sample.g_count = permuted_congruential_generator( 1000 );
-        sample.t_count = permuted_congruential_generator( 1000 );
-        auto const old_sum = nucleotide_sum( sample );
+        // LOG_DBG << "===========================";
 
-        // Some cases will be below the max sum, but that's okay and needs testing as well.
-        auto const max = permuted_congruential_generator( 1000 );
+        SampleCounts sample;
+        sample.a_count = permuted_congruential_generator( 100 );
+        sample.c_count = permuted_congruential_generator( 100 );
+        sample.g_count = permuted_congruential_generator( 100 );
+        sample.t_count = permuted_congruential_generator( 100 );
+        sample.n_count = permuted_congruential_generator( 100 );
+        sample.d_count = permuted_congruential_generator( 100 );
+        auto const old_sum = sample_counts_sum( sample );
 
-        // LOG_DBG << sample.a_count << ":" << sample.c_count << ":" << sample.g_count << ":" << sample.t_count << " --> " << max;
+        // Some cases will be below the target sum, but that's okay and needs testing as well.
+        auto const target = permuted_congruential_generator( 600 );
 
-        // Run the function and its tests
-        transformer( sample, max );
-        auto const new_sum = nucleotide_sum( sample );
-        EXPECT_LE( new_sum, old_sum );
-        EXPECT_LE( new_sum, max );
-        if( old_sum >= max ) {
-            EXPECT_EQ( new_sum, max );
+        // LOG_DBG << sample.a_count << ":" << sample.c_count << ":" << sample.g_count << ":" << sample.t_count << ":" << sample.n_count << ":" << sample.d_count << " @ " << old_sum << " --> " << target;
+
+        // Run the function and recount
+        transformer( sample, target );
+        auto const new_sum = sample_counts_sum( sample );
+
+        // LOG_DBG << sample.a_count << ":" << sample.c_count << ":" << sample.g_count << ":" << sample.t_count << ":" << sample.n_count << ":" << sample.d_count << " @ " << new_sum;
+
+        // We test this for sub-sampling, and for re-sampling.
+        // In the former case, we expect the counts to not change if their sum did not exceed
+        // the target. In the latter case, we expect them to always match the target coverage.
+        if( skip_if_below_target_depth ) {
+            EXPECT_LE( new_sum, old_sum );
+            EXPECT_LE( new_sum, target );
+            if( old_sum >= target ) {
+                EXPECT_EQ( new_sum, target );
+            } else {
+                EXPECT_EQ( new_sum, old_sum );
+            }
         } else {
-            EXPECT_EQ( new_sum, old_sum );
+            EXPECT_EQ( new_sum, target );
         }
-
-        // LOG_DBG << sample.a_count << ":" << sample.c_count << ":" << sample.g_count << ":" << sample.t_count;
     }
 }
 
-TEST( BaseCounts, Subscale )
+TEST( SampleCounts, Subscale )
 {
-    test_base_counts_subsampling_<void(*)(BaseCounts&, size_t)>( transform_subscale );
+    test_sample_counts_subsampling_<void(*)(SampleCounts&, size_t)>(
+        subscale_counts, true
+    );
 }
 
-TEST( BaseCounts, SubsampleWithReplacement )
+TEST( SampleCounts, Rescale )
 {
-    test_base_counts_subsampling_<void(*)(BaseCounts&, size_t)>( transform_subsample_with_replacement );
+    test_sample_counts_subsampling_<void(*)(SampleCounts&, size_t)>(
+        rescale_counts, false
+    );
 }
 
-TEST( BaseCounts, SubsampleWithoutReplacement )
+TEST( SampleCounts, SubsampleWithReplacement )
 {
-    test_base_counts_subsampling_<void(*)(BaseCounts&, size_t)>( transform_subsample_without_replacement );
+    test_sample_counts_subsampling_<void(*)(SampleCounts&, size_t)>(
+        subsample_counts_with_replacement, true
+    );
+}
+
+TEST( SampleCounts, Resample )
+{
+    test_sample_counts_subsampling_<void(*)(SampleCounts&, size_t)>(
+        resample_counts, false
+    );
+}
+
+TEST( SampleCounts, SubsampleWithoutReplacement )
+{
+    test_sample_counts_subsampling_<void(*)(SampleCounts&, size_t)>(
+        subsample_counts_without_replacement, true
+    );
 }

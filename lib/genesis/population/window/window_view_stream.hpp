@@ -19,9 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     Contact:
-    Lucas Czech <lczech@carnegiescience.edu>
-    Department of Plant Biology, Carnegie Institution For Science
-    260 Panama Street, Stanford, CA 94305, USA
+    Lucas Czech <lucas.czech@sund.ku.dk>
+    University of Copenhagen, Globe Institute, Section for GeoGenetics
+    Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
 /**
@@ -171,6 +171,12 @@ public:
             current_ = parent_->window_stream_->begin();
             end_     = parent_->window_stream_->end();
 
+            // Edge case for empty data.
+            if( current_ == end_ ) {
+                parent_ = nullptr;
+                return;
+            }
+
             // Start a view into the first window. This creates a view that mirrors the underlying
             // window, and iteratres through it, using the WindowView constructor that takes a Window.
             window_view_ = WindowViewType{ *current_ };
@@ -178,7 +184,7 @@ public:
 
     public:
 
-        virtual ~DerivedIterator() = default;
+        virtual ~DerivedIterator() override = default;
 
         DerivedIterator( self_type const& ) = default;
         DerivedIterator( self_type&& )      = default;
@@ -250,7 +256,7 @@ public:
         : window_stream_( std::move( window_iterator ))
     {}
 
-    virtual ~WindowViewStream() = default;
+    virtual ~WindowViewStream() override = default;
 
     WindowViewStream( WindowViewStream const& ) = default;
     WindowViewStream( WindowViewStream&& )      = default;

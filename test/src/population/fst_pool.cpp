@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     Contact:
-    Lucas Czech <lczech@carnegiescience.edu>
-    Department of Plant Biology, Carnegie Institution For Science
-    260 Panama Street, Stanford, CA 94305, USA
+    Lucas Czech <lucas.czech@sund.ku.dk>
+    University of Copenhagen, Globe Institute, Section for GeoGenetics
+    Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
 /**
@@ -30,25 +30,35 @@
 
 #include "src/common.hpp"
 
-#include "genesis/population/base_counts.hpp"
-#include "genesis/population/formats/simple_pileup_input_stream.hpp"
-#include "genesis/population/formats/simple_pileup_reader.hpp"
-#include "genesis/population/formats/sync_reader.hpp"
-#include "genesis/population/streams/variant_input_stream.hpp"
-#include "genesis/population/functions/filter_transform.hpp"
-#include "genesis/population/functions/fst_pool_functions.hpp"
-#include "genesis/population/functions/fst_pool_processor.hpp"
-#include "genesis/population/functions/functions.hpp"
-#include "genesis/population/window/sliding_interval_window_stream.hpp"
+#include "genesis/population/sample_counts.hpp"
+#include "genesis/population/format/simple_pileup_input_stream.hpp"
+#include "genesis/population/format/simple_pileup_reader.hpp"
+#include "genesis/population/format/sync_reader.hpp"
+#include "genesis/population/stream/variant_input_stream.hpp"
+#include "genesis/population/stream/variant_input_stream_sources.hpp"
+#include "genesis/population/stream/variant_input_stream_adapters.hpp"
+#include "genesis/population/filter/sample_counts_filter_numerical.hpp"
+#include "genesis/population/filter/sample_counts_filter.hpp"
+#include "genesis/population/filter/variant_filter_numerical.hpp"
+#include "genesis/population/filter/variant_filter.hpp"
+#include "genesis/population/function/fst_pool_functions.hpp"
+#include "genesis/population/function/fst_pool_processor.hpp"
+#include "genesis/population/function/functions.hpp"
+#include "genesis/population/window/interval_window_stream.hpp"
 #include "genesis/population/window/sliding_window_generator.hpp"
 #include "genesis/population/window/window.hpp"
 #include "genesis/utils/containers/transform_iterator.hpp"
 #include "genesis/utils/core/options.hpp"
+#include "genesis/utils/math/random.hpp"
 
 using namespace genesis::population;
 using namespace genesis::utils;
 
-TEST( Structure, FstPoolGenerator )
+// =================================================================================================
+//     Generator (deprecated)
+// =================================================================================================
+
+TEST( FST, FstPoolGenerator )
 {
     // Equivalent PoPoolation call for conventional F_ST:
     // perl fst-sliding.pl --input p1_p2.sync --output p1_p2.fst_conventional --suppress-noninformative --min-count 6 --min-coverage 50 --max-coverage 200 --min-covered-fraction 1 --window-size 100 --step-size 100 --pool-size 500 > log_conventional.txt
@@ -62,11 +72,11 @@ TEST( Structure, FstPoolGenerator )
     // Settings
     size_t const poolsize = 500;
     size_t const min_allele_count = 6;
-    size_t const min_coverage = 50;
-    size_t const max_coverage = 200;
+    size_t const min_read_depth = 50;
+    size_t const max_read_depth = 200;
     size_t const window_width = 100;
     size_t const window_stride = 100;
-    // settings.min_coverage_fraction = 1.0;
+    // settings.min_read_depth_fraction = 1.0;
     // settings.window_width = 100;
     // settings.window_stride = 100;
     // settings.min_phred_score = 20;
@@ -108,7 +118,7 @@ TEST( Structure, FstPoolGenerator )
 
     // Prepare the window.
     size_t cnt = 0;
-    using WindowGen = SlidingWindowGenerator<std::vector<BaseCounts>>;
+    using WindowGen = SlidingWindowGenerator<std::vector<SampleCounts>>;
     WindowGen window_gen( SlidingWindowType::kInterval, window_width, window_stride );
     // window_gen.anchor_type( WindowAnchorType::kIntervalMidpoint );
     window_gen.add_emission_plugin( [&]( WindowGen::Window const& window ) {
@@ -122,14 +132,14 @@ TEST( Structure, FstPoolGenerator )
         // Unfortunately, we need to versions of this, one that just gives the counts,
         // and one that filters min counts, as PoPoolation differs in their implementation.
         auto pop1 = make_transform_range(
-            []( WindowGen::Window::Entry const& entry ) -> BaseCounts const& {
+            []( WindowGen::Window::Entry const& entry ) -> SampleCounts const& {
                 // LOG_DBG1 << "pop1 " << entry.position << " " << entry.data[0];
                 return entry.data[0];
             },
             window
         );
         auto pop2 = make_transform_range(
-            []( WindowGen::Window::Entry const& entry ) -> BaseCounts const& {
+            []( WindowGen::Window::Entry const& entry ) -> SampleCounts const& {
                 // LOG_DBG1 << "pop2 " << entry.position << " " << entry.data[1];
                 return entry.data[1];
             },
@@ -197,20 +207,20 @@ TEST( Structure, FstPoolGenerator )
         // transform_by_min_count( sample_set.samples[1], min_allele_count );
 
         // Ugly relic of many refactorings to do it this way... but good enough for now.
-        auto merged = merge( sample_set.samples );
-        BaseCountsFilter filter;
+        auto merged = merge( sample_set.samples, SampleCountsFilterPolicy::kOnlyPassing );
+        SampleCountsFilterNumericalParams filter;
         filter.min_count = min_allele_count;
-        filter.min_coverage = min_coverage;
-        filter.max_coverage = max_coverage;
+        filter.min_read_depth = min_read_depth;
+        filter.max_read_depth = max_read_depth;
         filter.only_biallelic_snps = true;
-        if( filter_base_counts( merged, filter )) {
+        if( apply_sample_counts_filter_numerical( merged, filter )) {
             window_gen.enqueue( sample_set.chromosome, sample_set.position, sample_set.samples );
         }
 
         // Old way of checking the status directly
         // if( status(
         //         merge( sample_set.samples ),
-        //         min_coverage, max_coverage, min_allele_count
+        //         min_read_depth, max_read_depth, min_allele_count
         //     ).is_biallelic
         // ) {
         //     // LOG_DBG << "enq " <<  sample_set.position << " " << merge( sample_set.samples );
@@ -219,7 +229,11 @@ TEST( Structure, FstPoolGenerator )
     }
 }
 
-TEST( Structure, FstPoolIterator )
+// =================================================================================================
+//     Stream
+// =================================================================================================
+
+TEST( FST, FstPoolIterator )
 {
     NEEDS_TEST_DATA;
     std::string const infile = environment->data_dir + "population/p1_p2.sync.gz";
@@ -227,11 +241,11 @@ TEST( Structure, FstPoolIterator )
     // Settings
     size_t const poolsize = 500;
     size_t const min_allele_count = 6;
-    size_t const min_coverage = 50;
-    size_t const max_coverage = 200;
+    size_t const min_read_depth = 50;
+    size_t const max_read_depth = 200;
     size_t const window_width = 100;
     size_t const window_stride = 100;
-    // settings.min_coverage_fraction = 1.0;
+    // settings.min_read_depth_fraction = 1.0;
     // settings.window_width = 100;
     // settings.window_stride = 100;
     // settings.min_phred_score = 20;
@@ -280,23 +294,23 @@ TEST( Structure, FstPoolIterator )
         // transform_by_min_count( sample_set.samples[1], min_allele_count );
 
         // Ugly relic of many refactorings to do it this way... but good enough for now.
-        auto merged = merge( variant.samples );
-        BaseCountsFilter filter;
+        auto merged = merge( variant.samples, SampleCountsFilterPolicy::kOnlyPassing );
+        SampleCountsFilterNumericalParams filter;
         filter.min_count = min_allele_count;
-        filter.min_coverage = min_coverage;
-        filter.max_coverage = max_coverage;
+        filter.min_read_depth = min_read_depth;
+        filter.max_read_depth = max_read_depth;
         filter.only_biallelic_snps = true;
-        return filter_base_counts( merged, filter );
+        return apply_sample_counts_filter_numerical( merged, filter );
 
         // Old way of checking the status directly
         // return status(
         //     merge( variant.samples ),
-        //     min_coverage, max_coverage, min_allele_count
+        //     min_read_depth, max_read_depth, min_allele_count
         // ).is_biallelic;
     });
 
     // Create a window iterator based on the Generic Input Stream.
-    auto win_it = make_default_sliding_interval_window_stream(
+    auto win_it = make_default_interval_window_stream(
         data_gen.begin(), data_gen.end(), window_width, window_stride
     );
 
@@ -316,14 +330,14 @@ TEST( Structure, FstPoolIterator )
         // Unfortunately, we need to versions of this, one that just gives the counts,
         // and one that filters min counts, as PoPoolation differs in their implementation.
         auto pop1 = make_transform_range(
-            []( VariantWindow::Entry const& entry ) -> BaseCounts const& {
+            []( VariantWindow::Entry const& entry ) -> SampleCounts const& {
                 // LOG_DBG1 << "pop1 " << entry.position << " " << entry.data[0];
                 return entry.data.samples[0];
             },
             window
         );
         auto pop2 = make_transform_range(
-            []( VariantWindow::Entry const& entry ) -> BaseCounts const& {
+            []( VariantWindow::Entry const& entry ) -> SampleCounts const& {
                 // LOG_DBG1 << "pop2 " << entry.position << " " << entry.data.samples[1];
                 return entry.data.samples[1];
             },
@@ -380,14 +394,16 @@ TEST( Structure, FstPoolIterator )
     }
 }
 
-TEST( Structure, FstPoolProcessor )
+TEST( FST, FstPoolProcessor )
 {
     NEEDS_TEST_DATA;
     std::string const infile = environment->data_dir + "population/p1_p2.sync.gz";
 
     // Make an FST processor for the two samples.
     std::vector<size_t> const poolsizes{ 100, 100 };
-    auto processor = make_fst_pool_processor<FstPoolCalculatorUnbiased>( poolsizes );
+    auto processor = make_fst_pool_processor<FstPoolCalculatorUnbiased>(
+        poolsizes, WindowAveragePolicy::kSum
+    );
     ASSERT_EQ( 1, processor.size() );
     processor.thread_pool( Options::get().global_thread_pool() );
     processor.threading_threshold( 0 );
@@ -398,15 +414,93 @@ TEST( Structure, FstPoolProcessor )
         processor.process( variant );
     }
 
+    // Get the non window averaged result.
     auto const result = processor.get_result();
     EXPECT_EQ( 1, result.size() );
-    EXPECT_FLOAT_EQ( -0.0041116024, result[0] );
+
+    // Th FST value changed here since the introduction of the proper window normalization,
+    // since pi total is computed at the end of each window now, instead of being summed
+    // during the window. This is a "ratio of averages" vs "average of ratios" difference,
+    // which now changes the values of our result...
+    // EXPECT_FLOAT_EQ( -0.0041116024, result[0] );
+    EXPECT_FLOAT_EQ( -0.00035794353, result[0] );
+
+    // Also test the involved pi values for consistency.
+    // The commented value below is the old pi total value before the redesign.
+    auto const vecs = processor.get_pi_vectors();
+    EXPECT_EQ( 1, std::get<0>( vecs ).size() );
+    EXPECT_EQ( 1, std::get<1>( vecs ).size() );
+    EXPECT_EQ( 1, std::get<2>( vecs ).size() );
+    EXPECT_FLOAT_EQ( 133.798915747651, std::get<0>( vecs )[0] );
+    EXPECT_FLOAT_EQ( 133.703165107056, std::get<1>( vecs )[0] );
+    EXPECT_FLOAT_EQ( 133.751040427354, std::get<2>( vecs )[0] );
+    // EXPECT_FLOAT_EQ( 133.251040427354, std::get<2>( vecs )[0] );
+
 }
+
+// =================================================================================================
+//     Random Fuzzy
+// =================================================================================================
+
+ // Declartion here. Defined in random_variants.cpp
+std::vector<Variant> test_create_random_variants_();
+
+void test_fst_fuzzy_run_( std::vector<Variant> const& data )
+{
+    // Make an FST processor
+    ASSERT_GT( data.size(), 0 );
+    auto const n_samples = data[0].samples.size();
+    auto const pool_sizes = std::vector<size_t>( n_samples, 100 );
+    auto const window_average_policy = static_cast<WindowAveragePolicy>(
+        permuted_congruential_generator( 0, 4 )
+    );
+    auto processor = make_fst_pool_processor<FstPoolCalculatorUnbiased>(
+        pool_sizes, window_average_policy
+    );
+
+    // Run the data
+    for( auto const& variant : data ) {
+        processor.process( variant );
+    }
+
+    // Test the result
+    auto const pairs = n_samples * ( n_samples - 1 ) / 2;
+    // size_t const window_length = data.size();
+    auto const result = processor.get_result();
+    EXPECT_EQ( pairs, result.size() );
+    for( auto const& r : result ) {
+        LOG_DBG << r;
+    }
+}
+
+TEST( FST, RandomFuzzy )
+{
+    // Random seed. Report it, so that in an error case, we can reproduce.
+    auto const seed = ::time(nullptr);
+    permuted_congruential_generator_init( seed );
+    LOG_INFO << "Seed: " << seed;
+
+    // For the duration of the test, we deactivate debug logging.
+    // But if needed, comment this line out, and each test will report its input.
+    LOG_SCOPE_LEVEL( genesis::utils::Logging::kInfo );
+
+    size_t num_tests = 5000;
+    for( size_t i = 0; i < num_tests; ++i ) {
+        LOG_DBG << "=================================";
+        LOG_DBG << "Test " << i;
+        auto const data = test_create_random_variants_();
+        test_fst_fuzzy_run_( data );
+    }
+}
+
+// =================================================================================================
+//     C++14 All Pairs
+// =================================================================================================
 
 // Test the C++14 helper functions that compute FST for all pairs of input.
 #if __cplusplus >= 201402L
 
-TEST( Structure, FstPoolAllPairs )
+TEST( FST, FstPoolAllPairs )
 {
     // See above for details. Here we simply test that the C++14 extension
     // to compute all pairs of FST between samples compiles at all.
@@ -425,25 +519,25 @@ TEST( Structure, FstPoolAllPairs )
     auto sync_end   = data_gen.end();
 
     // Create a window iterator based on the Generic Input Stream.
-    auto win_it = make_default_sliding_interval_window_stream(
+    auto win_it = make_default_interval_window_stream(
         sync_begin, sync_end, window_width
     );
 
     // Use the code simitor to what is documented in compute_pairwise_f_st()
     for( auto const& window : win_it ) {
 
-        // Return the BaseCounts part of the Variants in the window.
-        auto base_counts_range = make_transform_range([&]( Variant const& var )  {
+        // Return the SampleCounts part of the Variants in the window.
+        auto sample_counts_range = make_transform_range([&]( Variant const& var )  {
             auto copy = var;
             transform_zero_out_by_min_count( copy, min_allele_count );
             return copy.samples;
         }, window);
 
         // Call an fst computation on that.
-        f_st_pool_kofler( poolsizes, base_counts_range.begin(), base_counts_range.end() );
-        f_st_pool_karlsson( base_counts_range.begin(), base_counts_range.end() );
-        f_st_pool_unbiased_nei( poolsizes, base_counts_range.begin(), base_counts_range.end() );
-        f_st_pool_unbiased_hudson( poolsizes, base_counts_range.begin(), base_counts_range.end() );
+        f_st_pool_kofler( poolsizes, sample_counts_range.begin(), sample_counts_range.end() );
+        f_st_pool_karlsson( sample_counts_range.begin(), sample_counts_range.end() );
+        f_st_pool_unbiased_nei( poolsizes, sample_counts_range.begin(), sample_counts_range.end() );
+        f_st_pool_unbiased_hudson( poolsizes, sample_counts_range.begin(), sample_counts_range.end() );
     }
 }
 

@@ -30,10 +30,10 @@
 
 #include "src/common.hpp"
 
-#include "genesis/population/base_counts.hpp"
-#include "genesis/population/formats/sam_flags.hpp"
-#include "genesis/population/formats/sam_variant_input_stream.hpp"
-#include "genesis/population/functions/functions.hpp"
+#include "genesis/population/sample_counts.hpp"
+#include "genesis/population/format/sam_flags.hpp"
+#include "genesis/population/format/sam_variant_input_stream.hpp"
+#include "genesis/population/function/functions.hpp"
 #include "genesis/utils/core/fs.hpp"
 #include "genesis/utils/text/string.hpp"
 
@@ -96,8 +96,8 @@ void run_sam_bam_cram_test_(
         EXPECT_EQ( exp_all_rg_tags[i], all_rg_tags[i] );
     }
 
-    BaseCounts total_counts;
-    auto sample_counts = std::vector<BaseCounts>{ exp_smp_size };
+    SampleCounts total_counts;
+    auto sample_counts = std::vector<SampleCounts>{ exp_smp_size };
     for( ; it != sam_it.end(); ++it ) {
         auto const& var = *it;
 

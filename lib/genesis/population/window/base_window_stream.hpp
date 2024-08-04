@@ -19,9 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     Contact:
-    Lucas Czech <lczech@carnegiescience.edu>
-    Department of Plant Biology, Carnegie Institution For Science
-    260 Panama Street, Stanford, CA 94305, USA
+    Lucas Czech <lucas.czech@sund.ku.dk>
+    University of Copenhagen, Globe Institute, Section for GeoGenetics
+    Oster Voldgade 5-7, 1350 Copenhagen K, Denmark
 */
 
 /**
@@ -65,6 +65,9 @@ namespace population {
  *    #entry_input_function needs to be provided to convert from `InputType` to this `Data`.
  *    By default, we take this to be the same as the `InputType`, meaning that the Window contains
  *    the same data type as the underlying stream that we get our data from.
+ *  * `WindowType`: The type of window that is emitted in each step of the iteration. This can
+ *    either be Window or WindowView, depending on whether the data needs to be kept in memory,
+ *    or can be produced on the fly while iterating each window.
  *
  * The three functors
  *
@@ -98,7 +101,12 @@ namespace population {
  *
  *     // Iterate over Windows.
  *     for( auto it = win_it.begin(); it != win_it.end(); ++it ) {
- *         ...
+ *         // Inside here, we typically then want to loop over the entries of each window
+ *     }
+ *
+ *     // Alternative version.
+ *     for( auto const& window : win_it ) {
+ *         // Same as above, nested loop here to iterate the entries of each window
  *     }
  *
  * Other derived classes work accordingly.
@@ -200,12 +208,31 @@ public:
 
         // Iterator() = delete;
 
-        Iterator( std::unique_ptr<BaseIterator> base_iterator )
-            : pimpl_( std::move( base_iterator ))
+        Iterator(
+            BaseWindowStream const* parent,
+            std::unique_ptr<BaseIterator> base_iterator
+        )
+            : base_parent_( parent )
+            , pimpl_( std::move( base_iterator ))
         {
             // Observe the first element, if this is an active iterator.
             assert( pimpl_ );
-            execute_observers_();
+
+            // If we are here from an end iterator, we do nothing.
+            if( !base_parent_ ) {
+                return;
+            }
+            assert( base_parent_ );
+
+            // Before starting to init anything, call the callbacks.
+            execute_begin_callbacks_();
+            execute_on_enter_observers_();
+
+            // Special case: no data. Need to execute the end callback as well.
+            assert( pimpl_ );
+            if( !pimpl_->get_parent_() ) {
+                execute_end_callbacks_();
+            }
         }
 
     public:
@@ -216,14 +243,26 @@ public:
         Iterator( Iterator const& ) = delete;
         Iterator( Iterator&& other )
         {
+            // Copy the base parent pointer, as that instance stays the same.
+            // We however need to move the pimpl, as we own it.
+            base_parent_ = other.base_parent_;
             pimpl_ = std::move( other.pimpl_ );
+
+            // Now reset the other, so that in case of a bug here, we induce a segfault
+            // instead of accidental undefined behaviour when accessing the old data.
+            other.base_parent_ = nullptr;
             other.pimpl_ = nullptr;
         }
 
         Iterator& operator= ( Iterator const& ) = delete;
         Iterator& operator= ( Iterator&& other )
         {
+            // Same as above.
+            // Probably we should follow the rule of five more closely here though,
+            // and implement one in terms of the other...
+            base_parent_ = other.base_parent_;
             pimpl_ = std::move( other.pimpl_ );
+            other.base_parent_ = nullptr;
             other.pimpl_ = nullptr;
             return *this;
         }
@@ -300,10 +339,29 @@ public:
 
         self_type& operator ++()
         {
-            // Advance to the next element, and observe it.
             assert( pimpl_ );
+            assert( base_parent_ );
+
+            // Advance to the next element, and observe it.
+            // This is the only place that we need to call the leaving observers:
+            // During normal iteration, this works fine anyway. Then, the last iteration
+            // will first call the leaving oberservers, then try to move to the next window,
+            // but find that there is none, and finish the iteration. By that time, the
+            // leaving oberserver has been called correclty already, so nothing else to do.
+
+            execute_on_leave_observers_();
             pimpl_->increment_();
-            execute_observers_();
+
+            // Now that we are at the new element, we execute the enter observers.
+            // If we instead reached the end of the input though, that one will do nothing.
+            // In that case however, we want to execute the end callbacks instead.
+            execute_on_enter_observers_();
+
+            assert( pimpl_ );
+            assert( base_parent_ );
+            if( !pimpl_->get_parent_() ) {
+                execute_end_callbacks_();
+            }
             return *this;
         }
 
@@ -344,16 +402,45 @@ public:
 
     private:
 
-        void execute_observers_()
+        void execute_on_enter_observers_()
         {
             // If there is still a parent, we are active,
-            // and execute all observers for the element.
+            // and execute all observers for the window.
             assert( pimpl_ );
             if( pimpl_->get_parent_() ) {
-                auto& element = pimpl_->get_current_window_();
-                for( auto const& observer : pimpl_->get_parent_()->observers_ ) {
-                    observer( element );
+                auto& window = pimpl_->get_current_window_();
+                for( auto const& observer : pimpl_->get_parent_()->on_enter_observers_ ) {
+                    observer( window );
                 }
+            }
+        }
+
+        void execute_on_leave_observers_()
+        {
+            // If there is still a parent, we are active,
+            // and execute all observers for the window.
+            assert( pimpl_ );
+            if( pimpl_->get_parent_() ) {
+                auto& window = pimpl_->get_current_window_();
+                for( auto const& observer : pimpl_->get_parent_()->on_leave_observers_ ) {
+                    observer( window );
+                }
+            }
+        }
+
+        void execute_begin_callbacks_() const
+        {
+            assert( base_parent_ );
+            for( auto const& cb : base_parent_->begin_callbacks_ ) {
+                cb();
+            }
+        }
+
+        void execute_end_callbacks_() const
+        {
+            assert( base_parent_ );
+            for( auto const& cb : base_parent_->end_callbacks_ ) {
+                cb();
             }
         }
 
@@ -363,6 +450,14 @@ public:
 
     private:
 
+        // Parent. This is only the base class, and hence cannot be used by the derived classes.
+        // We need it here for the begin and end callbacks only, as those need to be run
+        // indepentently of the derived classes.
+        BaseWindowStream const* base_parent_ = nullptr;
+
+        // Implementation of the derived iterator. This is where all the logic for the actual
+        // window iteration lives. We use the pimpl idiom here so that this class here does
+        // not need to expose derived interfaces.
         std::unique_ptr<BaseIterator> pimpl_;
 
     };
@@ -542,29 +637,106 @@ public:
     // -------------------------------------------------------------------------
 
     /**
-     * @brief Add a observer function that is executed once for each window during the iteration.
+     * @brief Add a observer function that is executed once for each window during the iteration,
+     * when entering the window during the iteration.
      *
      * These functions are executed when starting and incrementing the iterator, once for each
      * window, in the order in which they are added here. They take the window (typically of type
-     * window or WindowView) that the iterator just moved to as their argument, so that user code
+     * Window or WindowView) that the iterator just moved to as their argument, so that user code
      * can react to the new window properties.
      *
      * They are a way of adding behaviour to the iteration loop that could also simply be placed
      * in the beginning of the loop body of the user code. Still, offering this here can reduce
-     * redundant code, such as logging Windows during the iteration.
+     * redundant code, such as logging window positions during the iteration.
      */
-    self_type& add_observer( std::function<void(WindowType const&)> const& observer )
+    self_type& add_on_enter_observer( std::function<void(WindowType const&)> const& observer )
     {
-        observers_.push_back( observer );
+        on_enter_observers_.push_back( observer );
+        return *this;
+    }
+
+    /**
+     * @brief Add a observer function that is executed once for each window during the iteration,
+     * when leaving the window during the iteration.
+     *
+     * These functions are executed when incrementing the iterator towards the next window or at the
+     * end of the iteration, once for each window, in the order in which they are added here.
+     * They take the window (typically of type Window or WindowView) that the iterator is about to
+     * move on from as their argument, so that user code can react to the new window properties.
+     *
+     * They are a way of adding behaviour to the iteration loop that could also simply be placed
+     * at the end of the loop body of the user code. Still, offering this here can reduce
+     * redundant code, such as logging window positions during the iteration.
+     */
+    self_type& add_on_leave_observer( std::function<void(WindowType const&)> const& observer )
+    {
+        on_leave_observers_.push_back( observer );
         return *this;
     }
 
     /**
      * @brief Clear all functions that are executed on incrementing to the next element.
+     *
+     * This clears both the on enter and on leave observers.
      */
     self_type& clear_observers()
     {
-        observers_.clear();
+        on_enter_observers_.clear();
+        on_leave_observers_.clear();
+        return *this;
+    }
+
+    /**
+     * @brief Add a callback function that is executed when beginning the iteration.
+     *
+     * Similar to the functionality offered by the observers, this could also be achieved by
+     * executing these functions direclty where needed, but having it as a callback here helps
+     * to reduce code duplication.
+     *
+     * See also add_end_callback().
+     */
+    self_type& add_begin_callback( std::function<void()> const& callback )
+    {
+        if( started_ ) {
+            throw std::runtime_error(
+                "Window Stream: Cannot change callbacks after iteration has started."
+            );
+        }
+        begin_callbacks_.push_back( callback );
+        return *this;
+    }
+
+    /**
+     * @brief Add a callback function that is executed when the end of the iteration is reached.
+     *
+     * This is similar to the add_begin_callback() functionality, but instead of executing the
+     * callback when starting the iteration, it is called when ending it. Again, this is meant
+     * as a means to reduce user code duplication, for example for logging needs.
+     */
+    self_type& add_end_callback( std::function<void()> const& callback )
+    {
+        if( started_ ) {
+            throw std::runtime_error(
+                "Window Stream: Cannot change callbacks after iteration has started."
+            );
+        }
+        end_callbacks_.push_back( callback );
+        return *this;
+    }
+
+    /**
+     * @brief Clear all functions that have been added via add_begin_callback() and
+     * add_end_callback().
+     */
+    self_type& clear_callbacks()
+    {
+        if( started_ ) {
+            throw std::runtime_error(
+                "Window Stream: Cannot change callbacks after iteration has started."
+            );
+        }
+        begin_callbacks_.clear();
+        end_callbacks_.clear();
         return *this;
     }
 
@@ -574,12 +746,19 @@ public:
 
     Iterator begin()
     {
-        return Iterator( get_begin_iterator_() );
+        if( started_ ) {
+            throw std::runtime_error(
+                "Window Stream is an input iterator (single pass), "
+                "but begin() has been called multiple times."
+            );
+        }
+        started_ = true;
+        return Iterator( this, get_begin_iterator_() );
     }
 
     Iterator end()
     {
-        return Iterator( get_end_iterator_() );
+        return Iterator( nullptr, get_end_iterator_() );
     }
 
     // -------------------------------------------------------------------------
@@ -591,7 +770,20 @@ protected:
     // Need a default for WindowViewStream.
     BaseWindowStream() = default;
 
+    /**
+     * @brief Get the begin iterator.
+     *
+     * Needs to be implemented by the derived class, to give the correct derived BaseIterator
+     * instance.
+     */
     virtual std::unique_ptr<BaseIterator> get_begin_iterator_() = 0;
+
+    /**
+     * @brief Get the end iterator.
+     *
+     * Needs to be implemented by the derived class, to give the correct derived BaseIterator
+     * instance.
+     */
     virtual std::unique_ptr<BaseIterator> get_end_iterator_() = 0;
 
     // -------------------------------------------------------------------------
@@ -603,9 +795,15 @@ private:
     // Underlying iterator to the data that we want to put in windows.
     InputStreamIterator begin_;
     InputStreamIterator end_;
+    mutable bool started_ = false;
 
     // Keep the observers for each window view.
-    std::vector<std::function<void(WindowType const&)>> observers_;
+    std::vector<std::function<void(WindowType const&)>> on_enter_observers_;
+    std::vector<std::function<void(WindowType const&)>> on_leave_observers_;
+
+    // We furthermore allow callbacks for the beginning and and of the iteration.
+    std::vector<std::function<void()>> begin_callbacks_;
+    std::vector<std::function<void()>> end_callbacks_;
 
 };
 
