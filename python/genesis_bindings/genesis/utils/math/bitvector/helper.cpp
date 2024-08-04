@@ -32,6 +32,7 @@
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
+#include <../python/custom_bindings/extensions/placement/helper.hpp>
 #include <pybind11/stl.h>
 
 

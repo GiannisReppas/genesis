@@ -8,7 +8,7 @@ from mylibgenesis.genesis.tree import *
 from mylibgenesis.genesis.placement import *
 
 
-class SampleFunctions(unittest.TestCase):
+class TestSampleFunctions(unittest.TestCase):
 
 	def test_FilterPlacements(self):
 		infile = "test/data/placement/duplicates_b.jplace"

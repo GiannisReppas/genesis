@@ -1,12 +1,5 @@
 //ignoring tests in comments
 
-////////// general
-add pybind11 autodownload in CMake script
-change make_genesis.py script to cmake file
-have a .copy() method for some classes
-bind ostream in python
-stossc warning (error for c++ version > 11)
-
 
 ////////// utils
 math/bitvector.py STREAMS - difficulties translating c++ to python code - __REPR__
@@ -20,19 +13,17 @@ try to write advanced and rangedBased tests in fasta.py
 
 
 ////////// taxonomy
+all tests work in python :)
 
 
 ////////// placement
-edge_color.py - No way to test it until to_string() is fixed
-manipulation.py - levelorder bug from tree waiting to be fixed
+! from_string bug is temporarily solved by reading from a file that contains the string (files ending in "\_py.txt") !
+edge_color test has to_string-related errors
+edge_color bind CommonTreePhyloxmlWriter (tree related)
+manipulation.py - unordered_map bug
 
 
 ////////// tree
-create a copy function for Node,EdgeData
-OR
-create a class only for python to keep a py::object in a CommonNodeData derived class
-ONLY IF IT IS REALLY NEEDED IN PYTHON
-
 tree/drawing.py - end of tests, find a way to bind ostream
 tree/drawing.py - tests don't check anything, they just execute commands
 

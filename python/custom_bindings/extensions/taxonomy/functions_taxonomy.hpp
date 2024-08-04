@@ -7,14 +7,6 @@
 inline void extend_functions_taxonomy( pybind11::module &handle)
 {
 	handle.def(
-		"hahaha",
-		[]()
-		{
-			printf("hahaha\n");
-		}
-	);
-
-	handle.def(
 		"find_taxon_by_name",
 		[](::genesis::taxonomy::Taxonomy& tax, std::string& name) -> pybind11::object
 		{

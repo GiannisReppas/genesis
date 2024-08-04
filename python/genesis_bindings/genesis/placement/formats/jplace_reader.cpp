@@ -40,6 +40,7 @@
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
+#include <../python/custom_bindings/extensions/placement/helper.hpp>
 #include <pybind11/stl.h>
 
 
@@ -64,6 +65,8 @@ struct PyCallBack_genesis_placement_PlacementEdgeData : public genesis::placemen
 
 void bind_genesis_placement_formats_jplace_reader(std::function< pybind11::module &(std::string const &namespace_) > &M)
 {
+
+	extend_helper(M("genesis::placement"));
 	{ // genesis::placement::JplaceReader file:genesis/placement/formats/jplace_reader.hpp line:99
 		pybind11::class_<genesis::placement::JplaceReader, std::shared_ptr<genesis::placement::JplaceReader>> cl(M("genesis::placement"), "JplaceReader", "Read Jplace data.\n\n This class provides facilities for reading `jplace` files into a Sample or SampleSet.\n Exemplary usage:\n\n     std::string infile = \"path/to/file.jplace\";\n     Sample smp = JplaceReader()\n         .invalid_number_behaviour( InvalidNumberBehaviour::kFix )\n         .read( from_file( infile ));\n\n Using \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		cl.def( pybind11::init( [](){ return new genesis::placement::JplaceReader(); } ) );

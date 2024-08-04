@@ -6,7 +6,7 @@ sys.path.append('./genesis_bindings')
 from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.placement import *
 
-class JplaceReader(unittest.TestCase):
+class TestJplaceReader(unittest.TestCase):
 
 	def test_from_file(self):
 		infile = "test/data/placement/test_a.jplace"

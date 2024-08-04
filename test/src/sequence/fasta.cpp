@@ -257,8 +257,6 @@ TEST( Sequence, FastaOutputIterator )
         }
     }
 
-std::cout << target << std::endl;
-
     // Compare to raw file.
     auto const data = utils::file_read( infile );
     EXPECT_EQ( data, target );

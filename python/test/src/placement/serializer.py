@@ -7,7 +7,7 @@ sys.path.append('./genesis_bindings')
 from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.placement import *
 
-class SampleSerializer(unittest.TestCase):
+class TestSampleSerializer(unittest.TestCase):
 
 	def test_SaveAndLoad(self):
 		infile  = "test/data/placement/test_a.jplace"

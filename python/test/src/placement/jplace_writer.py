@@ -7,7 +7,7 @@ sys.path.append('./genesis_bindings')
 from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.placement import *
 
-class JplaceWriter(unittest.TestCase):
+class TestJplaceWriter(unittest.TestCase):
 
 	def test_to_target(self):
 		infile = "test/data/placement/test_a.jplace"

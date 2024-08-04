@@ -8,7 +8,7 @@ from mylibgenesis.genesis.tree import *
 from mylibgenesis.genesis.placement import *
 
 
-class SampleMeasures(unittest.TestCase):
+class TestSampleMeasures(unittest.TestCase):
 
 	def test_ImbalanceVector(self):
 		# Read sample
@@ -19,9 +19,6 @@ class SampleMeasures(unittest.TestCase):
 		imbalance_vec   = epca_imbalance_vector( smp, False )
 		edge_weight_vec = placement_mass_per_edges_with_multiplicities( smp )
 		self.assertEqual( len(imbalance_vec), len(edge_weight_vec) )
-
-		# LOG_DBG << "imb " << utils::join( imbalance_vec, " " );
-		# LOG_DBG << "wgt " << utils::join( edge_weight_vec, " " );
 
 		# Get indicator which edge is on which side.
 		edge_side_mat = edge_sides( smp.tree() )
@@ -37,8 +34,6 @@ class SampleMeasures(unittest.TestCase):
 
 		self.assertEqual( imbalance_vec, combined )
 		self.assertEqual( combined2, combined )
-
-		# LOG_DBG << "comb " << utils::join( combined, " " );
 
 if __name__ == '__main__':
     unittest.main()

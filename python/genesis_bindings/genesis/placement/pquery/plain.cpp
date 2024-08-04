@@ -1,4 +1,3 @@
-#include <functional>
 #include <genesis/placement/function/helper.hpp>
 #include <genesis/placement/placement_tree.hpp>
 #include <genesis/placement/pquery.hpp>
@@ -22,8 +21,6 @@
 #include <memory>
 #include <sstream> // __str__
 #include <string>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include <functional>
@@ -45,6 +42,7 @@
 #include <../python/custom_bindings/extensions/taxonomy/iterator.hpp>
 #include <../python/custom_bindings/extensions/tree/tree.hpp>
 #include <../python/custom_bindings/extensions/tree/functions_tree.hpp>
+#include <../python/custom_bindings/extensions/placement/helper.hpp>
 #include <pybind11/stl.h>
 
 
@@ -66,12 +64,6 @@ void bind_genesis_placement_pquery_plain(std::function< pybind11::module &(std::
 		cl.def_readwrite("placements", &genesis::placement::PqueryPlain::placements);
 		cl.def("assign", (struct genesis::placement::PqueryPlain & (genesis::placement::PqueryPlain::*)(const struct genesis::placement::PqueryPlain &)) &genesis::placement::PqueryPlain::operator=, "C++: genesis::placement::PqueryPlain::operator=(const struct genesis::placement::PqueryPlain &) --> struct genesis::placement::PqueryPlain &", pybind11::return_value_policy::reference_internal, pybind11::arg(""));
 	}
-	// genesis::placement::edge_num_to_edge_map(const class genesis::tree::Tree &) file:genesis/placement/function/helper.hpp line:60
-	M("genesis::placement").def("edge_num_to_edge_map", (class std::unordered_map<int, class genesis::tree::TreeEdge *, struct std::hash<int>, struct std::equal_to<int>, class std::allocator<struct std::pair<const int, class genesis::tree::TreeEdge *> > > (*)(const class genesis::tree::Tree &)) &genesis::placement::edge_num_to_edge_map, "Return a mapping of `edge_num` integers to the corresponding PlacementTreeEdge object.\n\n In a valid `jplace` file, the `edge_nums` are in increasing order with a postorder traversal of\n the tree. However, as Genesis does not need this constraint, we return a map here instead.\n\nC++: genesis::placement::edge_num_to_edge_map(const class genesis::tree::Tree &) --> class std::unordered_map<int, class genesis::tree::TreeEdge *, struct std::hash<int>, struct std::equal_to<int>, class std::allocator<struct std::pair<const int, class genesis::tree::TreeEdge *> > >", pybind11::arg("tree"));
-
-	// genesis::placement::edge_num_to_edge_map(const class genesis::placement::Sample &) file:genesis/placement/function/helper.hpp line:68
-	M("genesis::placement").def("edge_num_to_edge_map", (class std::unordered_map<int, class genesis::tree::TreeEdge *, struct std::hash<int>, struct std::equal_to<int>, class std::allocator<struct std::pair<const int, class genesis::tree::TreeEdge *> > > (*)(const class genesis::placement::Sample &)) &genesis::placement::edge_num_to_edge_map, "Return a mapping of edge_num integers to the corresponding PlacementTreeEdge object.\n\n This function depends on the tree only and does not involve any pqueries. Thus, it forwards to\n edge_num_to_edge_map( PlacementTree const& ). See there for details.\n\nC++: genesis::placement::edge_num_to_edge_map(const class genesis::placement::Sample &) --> class std::unordered_map<int, class genesis::tree::TreeEdge *, struct std::hash<int>, struct std::equal_to<int>, class std::allocator<struct std::pair<const int, class genesis::tree::TreeEdge *> > >", pybind11::arg("smp"));
-
 	// genesis::placement::pqueries_per_edge(const class genesis::placement::Sample &, bool) file:genesis/placement/function/helper.hpp line:77
 	M("genesis::placement").def("pqueries_per_edge", [](const class genesis::placement::Sample & a0) -> std::vector<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> >, class std::allocator<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> > > > { return genesis::placement::pqueries_per_edge(a0); }, "", pybind11::arg("sample"));
 	M("genesis::placement").def("pqueries_per_edge", (class std::vector<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> >, class std::allocator<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> > > > (*)(const class genesis::placement::Sample &, bool)) &genesis::placement::pqueries_per_edge, "Return a mapping from each edge to the Pqueries on that edge.\n\n If  is `false` (default), each PqueryPlacement of the\n \n\n\n\n\nC++: genesis::placement::pqueries_per_edge(const class genesis::placement::Sample &, bool) --> class std::vector<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> >, class std::allocator<class std::vector<const class genesis::placement::Pquery *, class std::allocator<const class genesis::placement::Pquery *> > > >", pybind11::arg("sample"), pybind11::arg("only_max_lwr_placements"));

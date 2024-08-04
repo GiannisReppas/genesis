@@ -7,7 +7,7 @@ from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.tree import *
 from mylibgenesis.genesis.placement import *
 
-class Sample(unittest.TestCase):
+class TestSample(unittest.TestCase):
 
 	def test_WithTree(self):
 		tree = PlacementTreeNewickReader().read( from_file('test/src/placement/sample_py.txt'))
@@ -17,7 +17,7 @@ class Sample(unittest.TestCase):
 		self.assertEqual(0, total_placement_count(smp))
 		self.assertTrue(validate(smp, True, False))
 
-	def member_test_sample_stats ( self, smp: Sample, expected_pquery_size: int, expected_placement_size: int, expected_name_size: int):
+	def func_test_sample_stats ( self, smp: Sample, expected_pquery_size: int, expected_placement_size: int, expected_name_size: int):
 		self.assertTrue (validate(smp, True, False))
 
 		self.assertEqual (expected_pquery_size,    smp.size())
@@ -34,26 +34,26 @@ class Sample(unittest.TestCase):
 		smp = JplaceReader().read( from_file(infile))
 
 		# Check before merging.
-		self.member_test_sample_stats(smp, 7, 8, 7)
+		self.func_test_sample_stats(smp, 7, 8, 7)
 
 		# Run the function of interest!
 		merge_duplicates(smp)
 
 		# Check after merging.
-		self.member_test_sample_stats(smp, 3, 7, 3)
+		self.func_test_sample_stats(smp, 3, 7, 3)
 
 	def test_MergeDuplicatesTransitive(self):
 		infile = "test/data/placement/duplicates_b.jplace"
 		smp = JplaceReader().read( from_file(infile))
 
 		# Check before merging.
-		self.member_test_sample_stats(smp, 7, 10, 11)
+		self.func_test_sample_stats(smp, 7, 10, 11)
 
 		# Run the function of interest!
 		merge_duplicates(smp)
 
 		# Check after merging.
-		self.member_test_sample_stats(smp, 1, 4, 4)
+		self.func_test_sample_stats(smp, 1, 4, 4)
 
 if __name__ == '__main__':
     unittest.main()

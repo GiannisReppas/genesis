@@ -6,7 +6,7 @@ sys.path.append('./genesis_bindings')
 from mylibgenesis.genesis.utils import *
 from mylibgenesis.genesis.placement import *
 
-class SampleMeasures(unittest.TestCase):
+class TestSampleMeasures(unittest.TestCase):
 
 	def test_EDPL(self):
 		infile = "test/data/placement/duplicates_b.jplace"
